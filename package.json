@@ -1,0 +1,14 @@
+{
+  "name": "icon-library",
+  "version": "1.0.0",
+  "description": "Internal self-hosted Icon Library powered by GitHub Pages & GitHub Actions",
+  "main": "index.html",
+  "type": "module",
+  "scripts": {
+    "build": "bun run scripts/build-icons.js",
+    "start": "bunx serve ."
+  },
+  "dependencies": {
+    "svgo": "^3.3.2"
+  }
+}
