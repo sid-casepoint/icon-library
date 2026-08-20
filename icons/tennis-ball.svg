@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="a" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 100 100">
+  <defs>
+    <style>
+      .f, .g {
+        fill: none;
+      }
+
+      .h {
+        fill: #05a126;
+      }
+
+      .g {
+        stroke: #171713;
+        stroke-width: 2.5px;
+      }
+
+      .i {
+        clip-path: url(#b);
+      }
+    </style>
+    <clipPath id="b">
+      <circle class="f" cx="50" cy="50" r="46.5"/>
+    </clipPath>
+  </defs>
+  <g class="i">
+    <path id="c" data-name="Path 20551" class="h" d="M96.5-33.7c25.68,0,46.5,20.82,46.5,46.5s-20.82,46.5-46.5,46.5S50,38.48,50,12.8s20.82-46.5,46.5-46.5"/>
+    <path id="d" data-name="Path 20552" class="h" d="M6.16,46.01c25.68,0,46.5,20.82,46.5,46.5s-20.82,46.5-46.5,46.5-46.5-20.82-46.5-46.5S-19.52,46.01,6.16,46.01"/>
+  </g>
+  <circle id="e" data-name="Ellipse 78" class="g" cx="50.25" cy="50.25" r="45.44"/>
+</svg>
