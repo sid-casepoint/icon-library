@@ -12,9 +12,9 @@ const GITHUB_BRANCH = 'main';
 // Paste the output from scripts/encrypt-token.js here:
 const ENCRYPTED_TOKEN_DATA = {
   "salt": "78a18277e1a7b6ef8092a90719f67ec8",
-  "iv": "304609c2560e90c8835e5d36",
-  "authTag": "fa217c030dff7510d21a166318c4714b",
-  "ciphertext": "038fb50bda8d0889ecae694f86641665a50787e9cf253fbceea42d45b41212c4ce0a202c4611598ce3ff27b682662c19fceb200b201103deeeaf0938ff6a992569115d9095690b21a329ce97066cb5d8365dc133e9bf05"
+  "iv": "15d1093d5fcd448595da8a0e",
+  "authTag": "817580232c0ce33889e31446d515bb71",
+  "ciphertext": "68d790ad8fd2d004ac1f1d163712e6b3f1e4e3f8ca99a4acf8ecab665b34eddb21fefc442549675a2b690e674109a57588f0a79884c9b90350306402be3963c2db9b03c6efc0f4b72337b3473d7eb57580dc5f482c65d879459d3734cd"
 };
 // ==========================================
 

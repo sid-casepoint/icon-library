@@ -6,9 +6,17 @@
   "type": "module",
   "scripts": {
     "build": "bun run scripts/build-icons.js",
-    "start": "bunx serve ."
+    "watch:icons": "nodemon -w icons -e svg -x \"bun run build\"",
+    "serve": "live-server .",
+    "dev": "concurrently \"bun run watch:icons\" \"bun run serve\"",
+    "start": "bun run dev"
   },
   "dependencies": {
     "svgo": "^3.3.2"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.5",
+    "live-server": "^1.2.2",
+    "nodemon": "^3.1.14"
   }
 }
