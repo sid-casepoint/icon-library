@@ -74,10 +74,14 @@ svgFiles.forEach(file => {
   const result = optimize(rawSvg, { path: file, ...svgoConfig });
   const optimizedSvg = result.data;
 
+  // Extract custom tags embedded in the SVG
+  const tagsMatch = rawSvg.match(/data-tags="([^"]+)"/i);
+  const customTags = tagsMatch ? tagsMatch[1].split(',').map(t => t.trim().toLowerCase()) : [];
+
   // Extract tags
   const nameParts = name.toLowerCase().split(/[-_]/);
   const extraTags = TAG_SYNONYMS[name] || [];
-  const tags = Array.from(new Set([...nameParts, ...extraTags]));
+  const tags = Array.from(new Set([...nameParts, ...extraTags, ...customTags])).filter(Boolean);
 
   // Extract SVG inner content for symbol generation
   const innerContent = optimizedSvg
@@ -92,6 +96,7 @@ svgFiles.forEach(file => {
     id,
     name,
     tags,
+    customTags, // Added this line
     svg: optimizedSvg,
     viewBox
   });

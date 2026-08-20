@@ -22,24 +22,17 @@ const ENCRYPTED_TOKEN_DATA = {
 const iconGrid = document.getElementById('iconGrid');
 const resultsCount = document.getElementById('resultsCount');
 const searchInput = document.getElementById('searchInput');
+const clearSearchBtn = document.getElementById('clearSearchBtn');
 const noResults = document.getElementById('noResults');
-
-// Customization Controls
-const iconColorInput = document.getElementById('iconColor');
-const iconColorHex = document.getElementById('iconColorHex');
-const iconSizeInput = document.getElementById('iconSize');
-const iconSizeValue = document.getElementById('iconSizeValue');
 const themeToggle = document.getElementById('themeToggle');
-
 // Modal Elements
 const iconModal = document.getElementById('iconModal');
 const modalIconPreview = document.getElementById('modalIconPreview');
 const modalIconTitle = document.getElementById('modalIconTitle');
 const modalIconTags = document.getElementById('modalIconTags');
-const codeSnippet = document.getElementById('codeSnippet').querySelector('code');
+const codeSnippet = document.getElementById('codeSnippet');
 const copyCodeBtn = document.getElementById('copyCodeBtn');
 const downloadSvgBtn = document.getElementById('downloadSvgBtn');
-const tabBtns = document.querySelectorAll('.tab-btn');
 
 // Upload & Delete Modals
 const uploadModal = document.getElementById('uploadModal');
@@ -51,7 +44,6 @@ const openUploadModalBtn = document.getElementById('openUploadModalBtn');
 const deleteIconBtn = document.getElementById('deleteIconBtn');
 const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
 
-let currentCodeFormat = 'svg';
 const DEFAULT_COLOR = '#3b82f6';
 let currentCodeValue = '';
 
@@ -88,15 +80,12 @@ function renderIcons() {
   }
   noResults.classList.add('hidden');
   
-  const size = iconSizeInput.value + 'px';
-  const color = iconColorInput.value;
-  
   iconGrid.innerHTML = filtered.map(icon => `
-    <button class="icon-card flex flex-col items-center justify-center p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 hover:border-brand hover:shadow-md transition-all group" data-id="${icon.id}">
-      <div class="mb-3 text-gray-800 dark:text-gray-200 group-hover:text-brand transition-colors" style="width: ${size}; height: ${size}; color: ${color};">
+    <button class="icon-card flex flex-col items-center justify-center p-8 bg-surfaceLight dark:bg-surfaceDark rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 hover:border-brand dark:hover:border-accent hover:shadow-lux hover:-translate-y-1 transition-all duration-300 group" data-id="${icon.id}">
+      <div class="mb-4 text-gray-800 dark:text-gray-200 group-hover:text-brand dark:group-hover:text-accent transition-colors w-10 h-10">
         ${icon.svg}
       </div>
-      <span class="text-xs text-gray-500 font-medium truncate w-full text-center">${icon.name}</span>
+      <span class="text-sm text-gray-500 dark:text-gray-400 font-medium truncate w-full text-center group-hover:text-gray-900 dark:group-hover:text-white transition-colors">${icon.name}</span>
     </button>
   `).join('');
   
@@ -109,11 +98,23 @@ function openModal(id) {
   currentIcon = iconsData.find(i => i.id === id);
   if (!currentIcon) return;
   modalIconTitle.textContent = currentIcon.name;
-  modalIconTags.innerHTML = currentIcon.tags.map(tag => `<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">${tag}</span>`).join('');
+  modalIconTags.innerHTML = currentIcon.tags.map(tag => `<button type="button" class="tag-btn inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-700 hover:bg-brand hover:text-white dark:bg-darkBg dark:text-gray-300 dark:hover:bg-accent dark:hover:text-gray-900 dark:border-gray-700 dark:border transition-colors shadow-sm" data-tag="${tag}">${tag}</button>`).join('');
+  
+  modalIconTags.querySelectorAll('.tag-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      closeModals();
+      updateSearch(e.target.dataset.tag);
+    });
+  });
+  
+  // Setup Edit Tags UI
+  document.getElementById('editTagsForm').classList.add('hidden');
+  document.getElementById('editTagsStatus').classList.add('hidden');
+  document.getElementById('editTagsInput').value = (currentIcon.customTags || []).join(', ');
+  
   modalIconPreview.innerHTML = currentIcon.svg;
   modalIconPreview.style.width = '80px';
   modalIconPreview.style.height = '80px';
-  modalIconPreview.style.color = iconColorInput.value;
   updateCodeSnippet();
   iconModal.classList.remove('hidden');
   document.body.style.overflow = 'hidden';
@@ -130,19 +131,7 @@ function closeModals() {
 
 function updateCodeSnippet() {
   if (!currentIcon) return;
-  const baseSvg = currentIcon.svg;
-  if (currentCodeFormat === 'svg') {
-    currentCodeValue = baseSvg;
-  } else if (currentCodeFormat === 'react') {
-    const camelName = currentIcon.name.split(/[-_]/).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('');
-    let jsxSvg = baseSvg.replace(/class=/g, 'className=')
-      .replace(/stroke-width/g, 'strokeWidth')
-      .replace(/stroke-linecap/g, 'strokeLinecap')
-      .replace(/stroke-linejoin/g, 'strokeLinejoin');
-    currentCodeValue = `export const ${camelName}Icon = ({ size = 24, color = "currentColor", className = "" }) => (\n  ${jsxSvg.replace('<svg', '<svg width={size} height={size} style={{ color }} className={className}')}\n);`;
-  } else if (currentCodeFormat === 'vue') {
-    currentCodeValue = `<template>\n  ${baseSvg}\n</template>\n<script setup>\n</script>`;
-  }
+  currentCodeValue = currentIcon.svg;
   codeSnippet.textContent = currentCodeValue;
 }
 
@@ -187,9 +176,9 @@ async function getFileSha(path, token) {
   return data.sha;
 }
 
-async function pushToGitHub(path, content, message, password, sha = null) {
-  const token = await decryptToken(password);
-  if (!token) throw new Error("Could not decrypt token.");
+async function pushToGitHub(path, content, message, sha = null) {
+  const token = sessionStorage.getItem('githubToken');
+  if (!token) throw new Error("Not authenticated.");
 
   const body = {
     message,
@@ -216,10 +205,20 @@ async function pushToGitHub(path, content, message, password, sha = null) {
 }
 // ---------------------------
 
+function updateSearch(query) {
+  searchQuery = query;
+  searchInput.value = query;
+  if (query) {
+    clearSearchBtn.classList.remove('hidden');
+  } else {
+    clearSearchBtn.classList.add('hidden');
+  }
+  renderIcons();
+}
+
 function setupEventListeners() {
-  searchInput.addEventListener('input', (e) => { searchQuery = e.target.value; renderIcons(); });
-  iconSizeInput.addEventListener('input', (e) => { iconSizeValue.textContent = e.target.value + 'px'; renderIcons(); });
-  iconColorInput.addEventListener('input', (e) => { iconColorHex.textContent = e.target.value; renderIcons(); if (currentIcon) modalIconPreview.style.color = e.target.value; });
+  searchInput.addEventListener('input', (e) => updateSearch(e.target.value));
+  clearSearchBtn.addEventListener('click', () => updateSearch(''));
   
   document.querySelectorAll('.closeModalBtn, .closeUploadModalBtn, .closeDeleteModalBtn').forEach(btn => {
     btn.addEventListener('click', closeModals);
@@ -229,15 +228,7 @@ function setupEventListeners() {
   });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModals(); });
   
-  tabBtns.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      tabBtns.forEach(b => { b.classList.remove('border-brand', 'text-brand'); b.classList.add('border-transparent', 'text-gray-500'); });
-      e.target.classList.remove('border-transparent', 'text-gray-500');
-      e.target.classList.add('border-brand', 'text-brand');
-      currentCodeFormat = e.target.dataset.tab;
-      updateCodeSnippet();
-    });
-  });
+
   
   copyCodeBtn.addEventListener('click', () => {
     navigator.clipboard.writeText(currentCodeValue);
@@ -246,9 +237,63 @@ function setupEventListeners() {
     setTimeout(() => copyCodeBtn.innerHTML = originalHtml, 2000);
   });
   
+  const downloadPngBtn = document.getElementById('downloadPngBtn');
+  const downloadJpgBtn = document.getElementById('downloadJpgBtn');
+  const exportSizeInput = document.getElementById('exportSizeInput');
+  
+  function downloadImage(format) {
+    if (!currentIcon) return;
+    const size = parseInt(exportSizeInput.value, 10) || 512;
+    const color = '#000000';
+    
+    // Create a canvas
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    
+    // If JPG, fill with white background first (since JPG doesn't support transparency)
+    if (format === 'jpeg') {
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, size, size);
+    }
+    
+    // Convert SVG to an image
+    const svgData = currentIcon.svg
+      .replace('<svg', `<svg width="${size}" height="${size}" style="color: ${color}"`)
+      .replace(/currentColor/g, color);
+      
+    const blob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const img = new Image();
+    
+    img.onload = () => {
+      ctx.drawImage(img, 0, 0, size, size);
+      URL.revokeObjectURL(url);
+      
+      const imgUrl = canvas.toDataURL(`image/${format}`, 1.0);
+      const a = document.createElement('a');
+      a.href = imgUrl;
+      a.download = `${currentIcon.name}.${format === 'jpeg' ? 'jpg' : 'png'}`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    };
+    img.src = url;
+  }
+  
+  downloadPngBtn.addEventListener('click', () => downloadImage('png'));
+  downloadJpgBtn.addEventListener('click', () => downloadImage('jpeg'));
+
   downloadSvgBtn.addEventListener('click', () => {
     if (!currentIcon) return;
-    const blob = new Blob([currentIcon.svg], {type: 'image/svg+xml'});
+    const size = parseInt(exportSizeInput.value, 10) || 512;
+    
+    const svgData = currentIcon.svg
+      .replace('<svg', `<svg width="${size}" height="${size}" style="color: #000000"`)
+      .replace(/currentColor/g, '#000000');
+      
+    const blob = new Blob([svgData], {type: 'image/svg+xml'});
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url; a.download = `${currentIcon.name}.svg`;
@@ -265,9 +310,8 @@ function setupEventListeners() {
     e.preventDefault();
     const file = document.getElementById('uploadFile').files[0];
     let name = document.getElementById('uploadName').value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '-');
-    const password = document.getElementById('uploadPassword').value;
 
-    if (!file || !name || !password) return;
+    if (!file || !name) return;
     if (!name.endsWith('.svg')) name += '.svg';
 
     const btn = document.getElementById('submitUploadBtn');
@@ -275,16 +319,24 @@ function setupEventListeners() {
     btn.textContent = 'Uploading...';
     uploadStatus.classList.remove('hidden', 'text-red-500', 'text-green-500');
     uploadStatus.classList.add('text-brand');
-    uploadStatus.textContent = 'Decrypting token & uploading...';
+    uploadStatus.textContent = 'Uploading to GitHub...';
 
     try {
-      const text = await file.text();
+      let text = await file.text();
+      const customTags = document.getElementById('uploadTags').value.trim();
+      
+      if (customTags) {
+        // Inject data-tags attribute into the opening <svg> tag
+        text = text.replace(/<svg\s/, `<svg data-tags="${customTags}" `);
+      }
+      
       const filePath = `icons/${name}`; // Directly in icons folder
+      const token = sessionStorage.getItem('githubToken');
       
       // Check if file exists to get SHA for overwriting
-      const existingSha = await getFileSha(filePath, await decryptToken(password)).catch(()=>null);
+      const existingSha = await getFileSha(filePath, token).catch(()=>null);
       
-      await pushToGitHub(filePath, text, `Add icon: ${name}`, password, existingSha);
+      await pushToGitHub(filePath, text, `Add icon: ${name}`, existingSha);
       
       uploadStatus.classList.replace('text-brand', 'text-green-500');
       uploadStatus.textContent = 'Success! GitHub Actions is rebuilding the site. Changes will appear in ~1 minute.';
@@ -308,8 +360,7 @@ function setupEventListeners() {
   });
 
   confirmDeleteBtn.addEventListener('click', async () => {
-    const password = document.getElementById('deletePassword').value;
-    if (!password || !currentIcon) return;
+    if (!currentIcon) return;
 
     confirmDeleteBtn.disabled = true;
     confirmDeleteBtn.textContent = 'Deleting...';
@@ -319,18 +370,17 @@ function setupEventListeners() {
 
     try {
       const filePath = `icons/${currentIcon.name}.svg`; // Directly in icons folder
-      const token = await decryptToken(password);
+      const token = sessionStorage.getItem('githubToken');
       const sha = await getFileSha(filePath, token);
       
       if (!sha) throw new Error("File not found on GitHub.");
       
-      await pushToGitHub(filePath, null, `Delete icon: ${currentIcon.name}`, password, sha);
+      await pushToGitHub(filePath, null, `Delete icon: ${currentIcon.name}`, sha);
       
       deleteStatus.classList.replace('text-brand', 'text-green-500');
       deleteStatus.textContent = 'Success! Rebuilding site...';
       setTimeout(() => {
         closeModals();
-        document.getElementById('deletePassword').value = '';
       }, 3000);
     } catch (err) {
       deleteStatus.classList.replace('text-brand', 'text-red-500');
@@ -338,6 +388,59 @@ function setupEventListeners() {
     } finally {
       confirmDeleteBtn.disabled = false;
       confirmDeleteBtn.textContent = 'Delete';
+    }
+  });
+
+  const editTagsBtn = document.getElementById('editTagsBtn');
+  const editTagsForm = document.getElementById('editTagsForm');
+  const saveTagsBtn = document.getElementById('saveTagsBtn');
+  const editTagsInput = document.getElementById('editTagsInput');
+  const editTagsStatus = document.getElementById('editTagsStatus');
+
+  editTagsBtn.addEventListener('click', () => {
+    editTagsForm.classList.toggle('hidden');
+  });
+
+  saveTagsBtn.addEventListener('click', async () => {
+    if (!currentIcon) return;
+    
+    saveTagsBtn.disabled = true;
+    saveTagsBtn.textContent = 'Saving...';
+    editTagsStatus.classList.remove('hidden', 'text-red-500', 'text-green-500');
+    editTagsStatus.classList.add('text-brand');
+    editTagsStatus.textContent = 'Updating tags on GitHub...';
+    
+    try {
+      const customTags = editTagsInput.value.trim();
+      let text = currentIcon.svg;
+      
+      // Remove existing data-tags if any
+      text = text.replace(/\sdata-tags="[^"]*"/g, '');
+      
+      if (customTags) {
+        text = text.replace(/<svg\s/, `<svg data-tags="${customTags}" `);
+      }
+      
+      const filePath = `icons/${currentIcon.name}.svg`;
+      const token = sessionStorage.getItem('githubToken');
+      const sha = await getFileSha(filePath, token);
+      
+      if (!sha) throw new Error("File not found on GitHub.");
+      
+      await pushToGitHub(filePath, text, `Update tags: ${currentIcon.name}`, sha);
+      
+      editTagsStatus.classList.replace('text-brand', 'text-green-500');
+      editTagsStatus.textContent = 'Success! Rebuilding site...';
+      
+      setTimeout(() => {
+        editTagsForm.classList.add('hidden');
+      }, 2000);
+    } catch (err) {
+      editTagsStatus.classList.replace('text-brand', 'text-red-500');
+      editTagsStatus.textContent = err.message;
+    } finally {
+      saveTagsBtn.disabled = false;
+      saveTagsBtn.textContent = 'Save';
     }
   });
 }
@@ -367,4 +470,43 @@ function setupTheme() {
   });
 }
 
-init();
+// Authentication Logic
+const loginScreen = document.getElementById('loginScreen');
+const appContent = document.getElementById('appContent');
+const loginForm = document.getElementById('loginForm');
+const sitePassword = document.getElementById('sitePassword');
+const loginError = document.getElementById('loginError');
+const loginBtn = document.getElementById('loginBtn');
+
+async function checkAuth() {
+  const token = sessionStorage.getItem('githubToken');
+  if (token) {
+    loginScreen.classList.add('hidden');
+    appContent.classList.remove('hidden');
+    init();
+  } else {
+    loginScreen.classList.remove('hidden');
+    appContent.classList.add('hidden');
+  }
+}
+
+loginForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  loginBtn.disabled = true;
+  loginBtn.textContent = 'Verifying...';
+  loginError.classList.add('hidden');
+  
+  try {
+    const token = await decryptToken(sitePassword.value);
+    sessionStorage.setItem('githubToken', token);
+    checkAuth();
+  } catch (err) {
+    loginError.textContent = "Invalid password. Access denied.";
+    loginError.classList.remove('hidden');
+  } finally {
+    loginBtn.disabled = false;
+    loginBtn.textContent = 'Unlock Icon Library';
+  }
+});
+
+checkAuth();
