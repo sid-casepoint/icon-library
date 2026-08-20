@@ -66,19 +66,8 @@ const svgoConfig = {
 };
 
 svgFiles.forEach(file => {
-  const relativePath = path.relative(ICONS_DIR, file);
-  const pathParts = relativePath.split(path.sep);
-  
-  let category = 'general';
-  let filename = pathParts[0];
-
-  if (pathParts.length > 1) {
-    category = pathParts[0];
-    filename = pathParts[pathParts.length - 1];
-  }
-
-  const name = path.basename(filename, '.svg');
-  const id = `${category}-${name}`;
+  const name = path.basename(file, '.svg');
+  const id = name; // Removed category prefix
   const rawSvg = fs.readFileSync(file, 'utf8');
 
   // Optimize SVG
@@ -88,7 +77,7 @@ svgFiles.forEach(file => {
   // Extract tags
   const nameParts = name.toLowerCase().split(/[-_]/);
   const extraTags = TAG_SYNONYMS[name] || [];
-  const tags = Array.from(new Set([...nameParts, category.toLowerCase(), ...extraTags]));
+  const tags = Array.from(new Set([...nameParts, ...extraTags]));
 
   // Extract SVG inner content for symbol generation
   const innerContent = optimizedSvg
@@ -102,7 +91,6 @@ svgFiles.forEach(file => {
   icons.push({
     id,
     name,
-    category,
     tags,
     svg: optimizedSvg,
     viewBox
@@ -110,6 +98,9 @@ svgFiles.forEach(file => {
 
   symbols.push(`<symbol id="${id}" viewBox="${viewBox}">${innerContent}</symbol>`);
 });
+
+// Sort alphabetically by name
+icons.sort((a, b) => a.name.localeCompare(b.name));
 
 // Write icons.json
 const indexPath = path.join(DIST_DIR, 'icons.json');

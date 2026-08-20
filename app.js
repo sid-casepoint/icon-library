@@ -1,21 +1,20 @@
 let iconsData = [];
-let currentCategory = 'all';
 let searchQuery = '';
 let currentIcon = null;
 
 // ==========================================
 // CONFIGURATION (Admin must set these)
 // ==========================================
-const GITHUB_OWNER = 'sid-casepoint'; // e.g. 'octocat'
-const GITHUB_REPO = 'icon-library'; // e.g. 'icon-library'
+const GITHUB_OWNER = 'sid-casepoint';
+const GITHUB_REPO = 'icon-library';
 const GITHUB_BRANCH = 'main';
 
 // Paste the output from scripts/encrypt-token.js here:
 const ENCRYPTED_TOKEN_DATA = {
   "salt": "78a18277e1a7b6ef8092a90719f67ec8",
-  "iv": "15d1093d5fcd448595da8a0e",
-  "authTag": "817580232c0ce33889e31446d515bb71",
-  "ciphertext": "68d790ad8fd2d004ac1f1d163712e6b3f1e4e3f8ca99a4acf8ecab665b34eddb21fefc442549675a2b690e674109a57588f0a79884c9b90350306402be3963c2db9b03c6efc0f4b72337b3473d7eb57580dc5f482c65d879459d3734cd"
+  "iv": "304609c2560e90c8835e5d36",
+  "authTag": "fa217c030dff7510d21a166318c4714b",
+  "ciphertext": "038fb50bda8d0889ecae694f86641665a50787e9cf253fbceea42d45b41212c4ce0a202c4611598ce3ff27b682662c19fceb200b201103deeeaf0938ff6a992569115d9095690b21a329ce97066cb5d8365dc133e9bf05"
 };
 // ==========================================
 
@@ -23,7 +22,6 @@ const ENCRYPTED_TOKEN_DATA = {
 const iconGrid = document.getElementById('iconGrid');
 const resultsCount = document.getElementById('resultsCount');
 const searchInput = document.getElementById('searchInput');
-const categoryList = document.getElementById('categoryList');
 const noResults = document.getElementById('noResults');
 
 // Customization Controls
@@ -62,7 +60,6 @@ async function init() {
     const res = await fetch('dist/icons.json');
     if (!res.ok) throw new Error('Could not load icons.json');
     iconsData = await res.json();
-    setupCategories();
     renderIcons();
     setupEventListeners();
     setupTheme();
@@ -72,34 +69,11 @@ async function init() {
   }
 }
 
-function setupCategories() {
-  const categories = ['all', ...new Set(iconsData.map(i => i.category))];
-  categoryList.innerHTML = categories.map(cat => `
-    <li>
-      <button class="category-btn w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${cat === currentCategory ? 'bg-brand text-white' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}" data-category="${cat}">
-        ${cat.charAt(0).toUpperCase() + cat.slice(1)}
-      </button>
-    </li>
-  `).join('');
-  
-  document.querySelectorAll('.category-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      currentCategory = e.target.dataset.category;
-      document.querySelectorAll('.category-btn').forEach(b => {
-        b.className = `category-btn w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${b.dataset.category === currentCategory ? 'bg-brand text-white' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`;
-      });
-      renderIcons();
-    });
-  });
-}
-
 function getFilteredIcons() {
   return iconsData.filter(icon => {
-    const matchesCategory = currentCategory === 'all' || icon.category === currentCategory;
-    if (!searchQuery) return matchesCategory;
+    if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
-    const matchesSearch = icon.name.toLowerCase().includes(query) || icon.tags.some(t => t.toLowerCase().includes(query));
-    return matchesCategory && matchesSearch;
+    return icon.name.toLowerCase().includes(query) || icon.tags.some(t => t.toLowerCase().includes(query));
   });
 }
 
@@ -184,7 +158,6 @@ async function decryptToken(password) {
   const authTagBuf = hexToBuf(ENCRYPTED_TOKEN_DATA.authTag);
   const cipherBuf = hexToBuf(ENCRYPTED_TOKEN_DATA.ciphertext);
   
-  // Combine ciphertext and authTag for Web Crypto AES-GCM
   const dataBuf = new Uint8Array(cipherBuf.length + authTagBuf.length);
   dataBuf.set(cipherBuf);
   dataBuf.set(authTagBuf, cipherBuf.length);
@@ -291,11 +264,10 @@ function setupEventListeners() {
   uploadForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const file = document.getElementById('uploadFile').files[0];
-    const name = document.getElementById('uploadName').value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '-');
-    const category = document.getElementById('uploadCategory').value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '-');
+    let name = document.getElementById('uploadName').value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '-');
     const password = document.getElementById('uploadPassword').value;
 
-    if (!file || !name || !category || !password) return;
+    if (!file || !name || !password) return;
     if (!name.endsWith('.svg')) name += '.svg';
 
     const btn = document.getElementById('submitUploadBtn');
@@ -307,7 +279,7 @@ function setupEventListeners() {
 
     try {
       const text = await file.text();
-      const filePath = `icons/${category}/${name}`;
+      const filePath = `icons/${name}`; // Directly in icons folder
       
       // Check if file exists to get SHA for overwriting
       const existingSha = await getFileSha(filePath, await decryptToken(password)).catch(()=>null);
@@ -346,7 +318,7 @@ function setupEventListeners() {
     deleteStatus.textContent = 'Deleting from GitHub...';
 
     try {
-      const filePath = `icons/${currentIcon.category}/${currentIcon.name}.svg`;
+      const filePath = `icons/${currentIcon.name}.svg`; // Directly in icons folder
       const token = await decryptToken(password);
       const sha = await getFileSha(filePath, token);
       
