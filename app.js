@@ -170,8 +170,15 @@ function svgToImgSrc(svgString) {
 
 function minifySVG(svgString) {
   if (!svgString) return '';
-  return svgString
-    .replace(/<!--[\s\S]*?-->/g, '')
+
+  let withoutComments = svgString;
+  let previous;
+  do {
+    previous = withoutComments;
+    withoutComments = withoutComments.replace(/<!--[\s\S]*?-->/g, '');
+  } while (withoutComments !== previous);
+
+  return withoutComments
     .replace(/>\s+</g, '><')
     .replace(/\s+/g, ' ')
     .replace(/\s*([{}:;,>])\s*/g, '$1')
