@@ -1415,51 +1415,63 @@ function setupEventListeners() {
       DOM.renameStatus.classList.remove('hidden', 'text-green-600', 'text-red-600');
       DOM.renameStatus.style.color = 'var(--fg)';
 
+      const originalId = currentIcon.id;
+      const oldName = currentIcon.name;
+
+      // Update local state first (Optimistic update)
+      currentIcon.name = newName;
+      currentIcon.id = newName;
+      currentIcon.category = 'general';
+      DOM.modalIconTitle.textContent = newName;
+
+      const idx = iconsData.findIndex(i => i && (i.id === originalId || i.name === originalId));
+      if (idx !== -1) {
+        iconsData[idx].name = newName;
+        iconsData[idx].id = newName;
+        iconsData[idx].category = 'general';
+      }
+
+      const localEdits = JSON.parse(localStorage.getItem('localEdits') || '{}');
+      localEdits[originalId] = {
+        newId: newName,
+        newName,
+        newSvg: currentIcon.svg,
+        newTags: currentIcon.tags,
+        editTime: Date.now()
+      };
+      localStorage.setItem('localEdits', JSON.stringify(localEdits));
+
       try {
         const token = Auth.get();
-        const oldPath = resolveIconPath(currentIcon);
-        const newPath = `icons/${newName}.svg`;
+        if (token) {
+          const oldPath = resolveIconPath({ id: originalId, name: oldName, category: 'general' });
+          const newPath = `icons/${newName}.svg`;
 
-        await pushToGitHub(newPath, currentIcon.svg, `Rename icon to ${newName}`, null);
+          await pushToGitHub(newPath, currentIcon.svg, `Rename icon to ${newName}`, null);
 
-        const oldSha = await getFileSha(oldPath, token);
-        if (oldSha) {
-          await pushToGitHub(oldPath, null, `Delete old icon ${currentIcon.name}`, oldSha);
+          const oldSha = await getFileSha(oldPath, token);
+          if (oldSha) {
+            await pushToGitHub(oldPath, null, `Delete old icon ${oldName}`, oldSha);
+          }
+          DOM.renameStatus.classList.add('text-green-600');
+          DOM.renameStatus.textContent = 'Saved!';
+        } else {
+          DOM.renameStatus.classList.add('text-green-600');
+          DOM.renameStatus.textContent = 'Saved locally.';
         }
-
-        const originalId = currentIcon.id;
-        currentIcon.name = newName;
-        currentIcon.id = newName;
-        currentIcon.category = 'general';
-        DOM.modalIconTitle.textContent = newName;
-
-        const idx = iconsData.findIndex(i => i && (i.id === originalId || i.name === originalId));
-        if (idx !== -1) {
-          iconsData[idx].name = newName;
-          iconsData[idx].id = newName;
-          iconsData[idx].category = 'general';
-        }
-
-        const localEdits = JSON.parse(localStorage.getItem('localEdits') || '{}');
-        localEdits[originalId] = {
-          newId: newName,
-          newName,
-          newSvg: currentIcon.svg,
-          newTags: currentIcon.tags,
-          editTime: Date.now()
-        };
-        localStorage.setItem('localEdits', JSON.stringify(localEdits));
-
-        DOM.renameStatus.classList.add('text-green-600');
-        DOM.renameStatus.textContent = 'Saved!';
 
         setTimeout(() => {
           DOM.cancelRenameBtn.click();
           renderIcons();
         }, 1000);
       } catch (err) {
-        DOM.renameStatus.classList.add('text-red-600');
-        DOM.renameStatus.textContent = err.message;
+        console.warn('GitHub rename error:', err);
+        DOM.renameStatus.classList.add('text-green-600');
+        DOM.renameStatus.textContent = 'Saved locally.';
+        setTimeout(() => {
+          DOM.cancelRenameBtn.click();
+          renderIcons();
+        }, 1000);
       } finally {
         DOM.saveRenameBtn.disabled = false;
       }

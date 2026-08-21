@@ -109,7 +109,7 @@ for (const file of svgFiles) {
   const optimizedSvg = result.data;
 
   // Tag extraction
-  const nameParts = name.toLowerCase().split(/[-_]/);
+  const nameParts = name.toLowerCase().split(/[-_]/).filter(Boolean);
   const extraTags = TAG_SYNONYMS[name] || [];
   const tags = Array.from(new Set([...nameParts, ...extraTags]));
 
