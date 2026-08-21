@@ -294,11 +294,17 @@ function getFilteredIcons() {
   const query = (DOM.searchInput ? DOM.searchInput.value : searchQuery).trim().toLowerCase();
   if (!query) return iconsData;
 
+  const terms = query.split(/\s+/).filter(Boolean);
+  if (terms.length === 0) return iconsData;
+
   return iconsData.filter(icon => {
     if (!icon) return false;
     const name = String(icon.name || '').toLowerCase();
-    const tags = Array.isArray(icon.tags) ? icon.tags : [];
-    return name.includes(query) || tags.some(t => String(t || '').toLowerCase().includes(query));
+    const tags = (Array.isArray(icon.tags) ? icon.tags : []).map(t => String(t || '').toLowerCase());
+    
+    return terms.every(term => {
+      return name.includes(term) || tags.some(t => t.includes(term));
+    });
   });
 }
 
