@@ -582,6 +582,17 @@ async function pushToGitHub(path, content, message, sha = null) {
   return true;
 }
 
+// Helper to prepare SVG for sharp canvas rasterization by forcing width/height to match target size
+function prepareSvgForRasterization(svgString, targetSize) {
+  if (!svgString) return '';
+  return svgString.replace(/<svg\b([^>]*)/i, (match, attrs) => {
+    const cleanedAttrs = attrs
+      .replace(/\bwidth\s*=\s*["'][^"']*["']/gi, '')
+      .replace(/\bheight\s*=\s*["'][^"']*["']/gi, '');
+    return `<svg${cleanedAttrs} width="${targetSize}" height="${targetSize}"`;
+  });
+}
+
 // ── Export / Download Engine ──────────────────────────────────────────────────
 function downloadImage(format) {
   if (!currentIcon) return;
@@ -597,12 +608,7 @@ function downloadImage(format) {
     ctx.fillRect(0, 0, size, size);
   }
 
-  // Ensure SVG has proper dimensions for rasterization
-  let svgData = currentIcon.svg || '';
-  if (!svgData.includes('width=') && !svgData.includes('height=')) {
-    svgData = svgData.replace('<svg', `<svg width="${size}" height="${size}"`);
-  }
-
+  const svgData = prepareSvgForRasterization(currentIcon.svg || '', size);
   const blob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const img = new Image();
@@ -636,11 +642,7 @@ function copyImageToClipboard(format) {
     ctx.fillRect(0, 0, size, size);
   }
 
-  let svgData = currentIcon.svg || '';
-  if (!svgData.includes('width=') && !svgData.includes('height=')) {
-    svgData = svgData.replace('<svg', `<svg width="${size}" height="${size}"`);
-  }
-
+  const svgData = prepareSvgForRasterization(currentIcon.svg || '', size);
   const blob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const img = new Image();
