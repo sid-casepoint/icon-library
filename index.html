@@ -331,6 +331,10 @@
     input[type="number"] {
       -moz-appearance: textfield;
     }
+    dialog::backdrop {
+      background-color: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col font-mono uppercase tracking-[0.08em]">
@@ -363,7 +367,7 @@
     <header class="backdrop-blur-xl border-b sticky top-0 z-30 w-full" style="background-color: var(--header-bg); border-color: var(--border-subtle);">
       <div class="w-full px-6 sm:px-10 lg:px-12 py-4 flex items-center justify-between">
         <!-- Logo -->
-        <button type="button" id="siteLogo" class="flex items-center gap-3 cursor-pointer select-none bg-transparent border-0 p-0 text-left outline-none">
+        <button type="button" id="siteLogo" class="flex items-center gap-3 cursor-pointer select-none bg-transparent border-0 p-0 text-left outline-none" aria-label="Icon Library Home" title="Reset Icon Library">
           <div class="w-7 h-7 rounded-[6px] flex items-center justify-center pointer-events-none" style="background-color: var(--fg); color: var(--bg);">
             <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect></svg>
           </div>
@@ -373,11 +377,11 @@
         <div class="flex items-center gap-4">
           <!-- 5-Theme Switcher -->
           <div class="flex items-center gap-2 p-1 rounded-[8px] border" style="background-color: var(--sub-bg); border-color: var(--border-subtle);" id="themeSwitcher" role="radiogroup" aria-label="Theme Switcher">
-            <button type="button" class="theme-btn w-5 h-5 rounded-full transition-all cursor-pointer" data-theme="light" title="Light (#ffffff)" style="background-color: #ffffff; box-shadow: 0 0 0 1px #e0e0e0;"></button>
-            <button type="button" class="theme-btn w-5 h-5 rounded-full transition-all cursor-pointer" data-theme="dark" title="Dark (#171713)" style="background-color: #171713; box-shadow: 0 0 0 1px #383830;"></button>
-            <button type="button" class="theme-btn w-5 h-5 rounded-full transition-all cursor-pointer" data-theme="beige" title="Beige (#F5F0E7)" style="background-color: #F5F0E7; box-shadow: 0 0 0 1px #ded5c5;"></button>
-            <button type="button" class="theme-btn w-5 h-5 rounded-full transition-all cursor-pointer" data-theme="yellow" title="Yellow (#FFC83A)" style="background-color: #FFC83A; box-shadow: 0 0 0 1px #e5b027;"></button>
-            <button type="button" class="theme-btn w-5 h-5 rounded-full transition-all cursor-pointer" data-theme="blue" title="Blue (#2526B3)" style="background-color: #2526B3; box-shadow: 0 0 0 1px #4547E8;"></button>
+            <button type="button" role="radio" aria-checked="true" aria-label="Light Theme" class="theme-btn w-5 h-5 rounded-full transition-all cursor-pointer" data-theme="light" title="Light (#ffffff)" style="background-color: #ffffff; box-shadow: 0 0 0 1px #e0e0e0;"></button>
+            <button type="button" role="radio" aria-checked="false" aria-label="Dark Theme" class="theme-btn w-5 h-5 rounded-full transition-all cursor-pointer" data-theme="dark" title="Dark (#171713)" style="background-color: #171713; box-shadow: 0 0 0 1px #383830;"></button>
+            <button type="button" role="radio" aria-checked="false" aria-label="Beige Theme" class="theme-btn w-5 h-5 rounded-full transition-all cursor-pointer" data-theme="beige" title="Beige (#F5F0E7)" style="background-color: #F5F0E7; box-shadow: 0 0 0 1px #ded5c5;"></button>
+            <button type="button" role="radio" aria-checked="false" aria-label="Yellow Theme" class="theme-btn w-5 h-5 rounded-full transition-all cursor-pointer" data-theme="yellow" title="Yellow (#FFC83A)" style="background-color: #FFC83A; box-shadow: 0 0 0 1px #e5b027;"></button>
+            <button type="button" role="radio" aria-checked="false" aria-label="Blue Theme" class="theme-btn w-5 h-5 rounded-full transition-all cursor-pointer" data-theme="blue" title="Blue (#2526B3)" style="background-color: #2526B3; box-shadow: 0 0 0 1px #4547E8;"></button>
           </div>
 
           <button type="button" id="openUploadModalBtn" class="btn-099-primary !py-2 !px-3.5 gap-2">
@@ -390,50 +394,49 @@
 
     <!-- Main Content Area (099 Full-Width Edge-to-Edge Fluid Layout) -->
     <main class="w-full flex-1 px-6 sm:px-10 lg:px-12 py-8">
-      <!-- Search Input -->
-      <div class="w-full relative mb-8" role="search">
-        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-          <svg class="w-4 h-4" style="color: var(--muted-soft);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-        </div>
-        <input type="text" id="searchInput" class="block w-full pl-11 pr-10 py-3.5 border rounded-[6px] text-xs tracking-[0.08em] focus:outline-none transition-colors" style="background-color: var(--card-bg); border-color: var(--border-subtle); color: var(--fg);" placeholder="SEARCH ICONS..." aria-label="Search icons">
-        <button type="button" id="clearSearchBtn" class="absolute inset-y-0 right-0 pr-4 flex items-center hidden transition-colors cursor-pointer" style="color: var(--muted-soft);" aria-label="Clear search">
-          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-        </button>
-      </div>
-
-      <!-- Controls Bar -->
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-4 border-b" style="border-color: var(--border-subtle);">
-        <div class="text-[12px] tracking-[0.08em] uppercase font-medium whitespace-nowrap shrink-0" style="color: var(--muted);">
-           <span id="iconCount">0</span> ICONS
-        </div>
-        
-        <div class="flex flex-col sm:flex-row w-full sm:w-auto items-stretch sm:items-center gap-3">
-          <!-- Sort Dropdown -->
-          <div class="w-full sm:w-60 relative">
-            <label for="sortSelect" class="sr-only">Sort Order</label>
-            <select id="sortSelect" class="block w-full h-full pl-3.5 pr-9 py-2.5 appearance-none truncate border rounded-[6px] text-[12px] tracking-[0.08em] focus:outline-none transition-colors cursor-pointer outline-none font-mono" style="background-color: var(--card-bg); border-color: var(--border-subtle); color: var(--fg);">
-              <option value="newest">SORT: NEWEST</option>
-              <option value="oldest">SORT: OLDEST</option>
-              <option value="az">SORT: A TO Z</option>
-              <option value="za">SORT: Z TO A</option>
-            </select>
-            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-              <svg class="w-3.5 h-3.5" style="color: var(--muted);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg>
-            </div>
+      <!-- Sticky Search and Controls Header (Sticks below main header, matching theme canvas) -->
+      <div id="stickySearchHeader" class="sticky top-[61px] z-20 w-full pt-4 pb-4 mb-8 flex items-center gap-3 transition-shadow duration-200" style="background-color: var(--bg);">
+        <!-- Search Input -->
+        <div class="flex-1 relative" role="search">
+          <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+            <svg class="w-4 h-4" style="color: var(--muted-soft);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
           </div>
+          <input type="text" id="searchInput" class="block w-full pl-11 pr-10 py-3.5 border rounded-[6px] text-xs tracking-[0.08em] focus:outline-none transition-colors" style="background-color: var(--card-bg); border-color: var(--border-subtle); color: var(--fg);" placeholder="SEARCH ICONS..." aria-label="Search icons">
+          <button type="button" id="clearSearchBtn" class="absolute inset-y-0 right-0 pr-4 flex items-center hidden transition-colors cursor-pointer" style="color: var(--muted-soft);" aria-label="Clear search">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
 
-          <!-- Grid Size Dropdown -->
-          <div class="w-full sm:w-60 relative">
-            <label for="gridSizeSelect" class="sr-only">Grid Size</label>
-            <select id="gridSizeSelect" class="block w-full h-full pl-3.5 pr-9 py-2.5 appearance-none truncate border rounded-[6px] text-[12px] tracking-[0.08em] focus:outline-none transition-colors cursor-pointer outline-none font-mono" style="background-color: var(--card-bg); border-color: var(--border-subtle); color: var(--fg);">
-              <option value="50">GRID: SMALL (50PX)</option>
-              <option value="75" selected>GRID: MEDIUM (75PX)</option>
-              <option value="100">GRID: LARGE (100PX)</option>
-            </select>
-            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-              <svg class="w-3.5 h-3.5" style="color: var(--muted);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg>
-            </div>
-          </div>
+        <!-- Sort Select Wrapper (Icon only) -->
+        <div class="relative w-11 h-11 border rounded-[6px] flex items-center justify-center transition-colors shrink-0" style="background-color: var(--card-bg); border-color: var(--border-subtle);" title="Sort Order">
+          <!-- Sort icon (descending lines) -->
+          <svg class="w-4 h-4" style="color: var(--muted);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 4h18M3 10h14M3 16h10M3 22h6" />
+          </svg>
+          <label for="sortSelect" class="sr-only">Sort Order</label>
+          <select id="sortSelect" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" aria-label="Sort order">
+            <option value="newest">SORT: NEWEST</option>
+            <option value="oldest">SORT: OLDEST</option>
+            <option value="az">SORT: A TO Z</option>
+            <option value="za">SORT: Z TO A</option>
+          </select>
+        </div>
+
+        <!-- Grid Size Select Wrapper (Icon only) -->
+        <div class="relative w-11 h-11 border rounded-[6px] flex items-center justify-center transition-colors shrink-0" style="background-color: var(--card-bg); border-color: var(--border-subtle);" title="Grid Size">
+          <!-- Grid icon (4 squares) -->
+          <svg class="w-4 h-4" style="color: var(--muted);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+            <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+            <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+            <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+          </svg>
+          <label for="gridSizeSelect" class="sr-only">Grid Size</label>
+          <select id="gridSizeSelect" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" aria-label="Grid size">
+            <option value="50">GRID: SMALL (50PX)</option>
+            <option value="75" selected>GRID: MEDIUM (75PX)</option>
+            <option value="100">GRID: LARGE (100PX)</option>
+          </select>
         </div>
       </div>
       
@@ -445,194 +448,185 @@
     </main>
   </div>
 
-  <!-- Icon Detail Popup (099 Style Modal) -->
-  <div id="iconModal" class="fixed inset-0 z-40 hidden transition-opacity duration-300" role="dialog" aria-modal="true" aria-labelledby="modalIconTitle">
-    <div class="fixed inset-0 bg-black/60 backdrop-blur-md backdrop-modal"></div>
-    <div class="fixed inset-0 z-10 flex items-center justify-center p-4">
-      <div id="iconDrawer" class="relative w-full max-w-[760px] max-h-[90vh] overflow-y-auto border rounded-[12px] shadow-2xl p-6 transform scale-95 opacity-0 transition-all duration-300" style="background-color: var(--modal-bg); border-color: var(--border-subtle); color: var(--fg);">
-        
-        <!-- Modal Header -->
-        <div class="flex items-center justify-between mb-6 pb-3.5 border-b" style="border-color: var(--border-subtle);">
-          <div class="flex items-center gap-2 flex-1">
-            <h3 class="text-xs font-normal tracking-[0.12em]" style="color: var(--fg);" id="modalIconTitle">ICON-NAME</h3>
-            <input type="text" id="renameIconInput" class="hidden text-xs tracking-[0.08em] border px-2 py-1 rounded-[4px] outline-none flex-1 max-w-[200px]" style="background-color: var(--card-bg); border-color: var(--border-subtle); color: var(--fg);" aria-label="New icon name" />
-            
-            <button type="button" id="renameIconBtn" class="transition-colors p-1 ml-1 cursor-pointer" style="color: var(--muted-soft);" title="Rename Icon" aria-label="Rename icon">
-              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-            </button>
-            
-            <button type="button" id="saveRenameBtn" class="hidden text-[10px] tracking-[0.08em] px-2.5 py-1 rounded-[4px] transition-colors cursor-pointer" style="background-color: var(--fg); color: var(--bg);">SAVE</button>
-            <button type="button" id="cancelRenameBtn" class="hidden text-[10px] tracking-[0.08em] px-2 py-1 transition-colors cursor-pointer" style="color: var(--muted);">CANCEL</button>
-            
-            <span id="renameStatus" role="status" aria-live="polite" class="hidden text-[10px] tracking-[0.08em] ml-2" style="color: var(--fg);">RENAMING...</span>
-          </div>
-
-          <div class="flex items-center gap-1.5">
-            <button type="button" id="deleteIconBtn" class="text-red-500 hover:text-red-600 transition-colors p-1.5 cursor-pointer" title="Delete Icon" aria-label="Delete icon">
-              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-            </button>
-            <button type="button" class="closeModalBtn transition-colors p-1.5 cursor-pointer" style="color: var(--muted-soft);" aria-label="Close icon detail">
-              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-            </button>
-          </div>
+  <!-- Icon Detail Popup (099 Style Modal using native HTML5 <dialog>) -->
+  <dialog id="iconModal" class="outline-none p-0 bg-transparent border-0 max-w-[760px] w-full max-h-[95vh] overflow-y-auto" aria-labelledby="modalIconTitle">
+    <div id="iconDrawer" class="relative w-full border rounded-[12px] shadow-2xl p-6" style="background-color: var(--modal-bg); border-color: var(--border-subtle); color: var(--fg);">
+      
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between mb-6 pb-3.5 border-b" style="border-color: var(--border-subtle);">
+        <div class="flex items-center gap-2 flex-1">
+          <h3 class="text-xs font-normal tracking-[0.12em]" style="color: var(--fg);" id="modalIconTitle">ICON-NAME</h3>
+          <input type="text" id="renameIconInput" class="hidden text-xs tracking-[0.08em] border px-2 py-1 rounded-[4px] outline-none flex-1 max-w-[200px]" style="background-color: var(--card-bg); border-color: var(--border-subtle); color: var(--fg);" aria-label="New icon name" />
+          
+          <button type="button" id="renameIconBtn" class="transition-colors p-1 ml-1 cursor-pointer" style="color: var(--muted-soft);" title="Rename Icon" aria-label="Rename icon">
+            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+          </button>
+          
+          <button type="button" id="saveRenameBtn" class="hidden text-[10px] tracking-[0.08em] px-2.5 py-1 rounded-[4px] transition-colors cursor-pointer" style="background-color: var(--fg); color: var(--bg);">SAVE</button>
+          <button type="button" id="cancelRenameBtn" class="hidden text-[10px] tracking-[0.08em] px-2 py-1 transition-colors cursor-pointer" style="color: var(--muted);">CANCEL</button>
+          
+          <span id="renameStatus" role="status" aria-live="polite" class="hidden text-[10px] tracking-[0.08em] ml-2" style="color: var(--fg);">RENAMING...</span>
         </div>
 
-        <div class="flex flex-col md:flex-row gap-6">
-          <!-- Left Column: Big Preview & Tags -->
-          <div class="flex-1 flex flex-col min-w-0">
-            <div class="w-full flex-1 min-h-[220px] flex flex-col items-center justify-center p-6 border rounded-[8px] mb-4 relative" style="background-color: var(--card-bg); border-color: var(--border-subtle);">
-              <div id="modalIconPreview" class="w-24 h-24 mb-3 flex items-center justify-center"></div>
-              <input type="file" id="replaceIconInput" accept=".svg" class="hidden">
-              <button type="button" id="replaceSvgBtn" class="btn-099-secondary !text-[10px] !py-1.5 !px-3 z-10">REPLACE SVG</button>
-              <span id="replaceStatus" role="status" aria-live="polite" class="mt-2 text-[10px] tracking-[0.08em] hidden" style="color: var(--fg);"></span>
-            </div>
-            
-            <div class="w-full text-left">
-              <div class="flex items-center justify-between mb-2">
-                <div id="modalIconTags" class="flex flex-wrap gap-1.5"></div>
-                <div class="relative group flex items-center justify-center">
-                  <button type="button" id="editTagsBtn" class="p-1 transition-colors cursor-pointer" style="color: var(--muted-soft);" aria-label="Edit tags">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
-                    </svg>
-                  </button>
-                  <div class="absolute bottom-full mb-2 right-0 px-2 py-1 text-[10px] tracking-[0.08em] rounded-[4px] invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none whitespace-nowrap z-50" style="background-color: var(--fg); color: var(--bg);">EDIT TAGS</div>
-                </div>
-              </div>
-              
-              <div id="editTagsForm" class="hidden opacity-0 transition-opacity duration-200 p-3 rounded-[6px] border mb-2" style="background-color: var(--card-bg); border-color: var(--border-subtle);">
-                <label for="editTagsInput" class="block text-[10px] tracking-[0.08em] mb-1.5" style="color: var(--muted);">TAGS (COMMA SEPARATED)</label>
-                <div class="flex gap-2">
-                  <input type="text" id="editTagsInput" class="flex-1 border rounded-[6px] px-2.5 py-1.5 text-xs outline-none" style="background-color: var(--card-bg); border-color: var(--border-subtle); color: var(--fg);">
-                  <button type="button" id="saveTagsBtn" class="btn-099-primary !py-1.5 !px-3 !text-[10px]">SAVE</button>
-                </div>
-                <p id="editTagsStatus" role="status" aria-live="polite" class="mt-2 text-xs hidden text-center"></p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Right Column: Export Tools -->
-          <div class="flex-1 flex flex-col gap-3.5 min-w-0">
-            <!-- Preset Sizes -->
-            <div class="flex items-end justify-center gap-3 pb-3 border-b" style="border-color: var(--border-subtle);">
-              <button type="button" class="preset-size-btn group flex flex-col items-center gap-1.5 transition-colors cursor-pointer" style="color: var(--muted-soft);" data-size="50">
-                <div class="preset-box border rounded-[6px] flex items-center justify-center transition-colors overflow-hidden" style="width: 46px; height: 46px; background-color: var(--card-bg); border-color: var(--border-subtle);">
-                  <div class="preset-icon-container w-full h-full p-2 flex items-center justify-center"></div>
-                </div>
-                <span class="text-[10px] tracking-[0.08em]">50PX</span>
-              </button>
-              <button type="button" class="preset-size-btn group flex flex-col items-center gap-1.5 transition-colors cursor-pointer" style="color: var(--muted-soft);" data-size="75">
-                <div class="preset-box border rounded-[6px] flex items-center justify-center transition-colors overflow-hidden" style="width: 68px; height: 68px; background-color: var(--card-bg); border-color: var(--border-subtle);">
-                  <div class="preset-icon-container w-full h-full p-2.5 flex items-center justify-center"></div>
-                </div>
-                <span class="text-[10px] tracking-[0.08em]">75PX</span>
-              </button>
-              <button type="button" class="preset-size-btn group flex flex-col items-center gap-1.5 transition-colors cursor-pointer" style="color: var(--fg);" data-size="100">
-                <div class="preset-box border-2 rounded-[6px] flex items-center justify-center overflow-hidden shadow-xs" style="width: 88px; height: 88px; background-color: var(--card-bg); border-color: var(--fg);">
-                  <div class="preset-icon-container w-full h-full p-3 flex items-center justify-center"></div>
-                </div>
-                <span class="text-[10px] tracking-[0.08em] font-medium" style="color: var(--fg);">100PX</span>
-              </button>
-            </div>
-
-            <!-- Custom Size Input -->
-            <div class="flex items-center justify-between border rounded-[6px] px-3 py-2 transition-colors" style="background-color: var(--card-bg); border-color: var(--border-subtle);">
-              <label for="exportSizeInput" class="text-[11px] tracking-[0.08em] whitespace-nowrap" style="color: var(--muted);">EXPORT SIZE</label>
-              <div class="flex items-center gap-1">
-                <input type="number" id="exportSizeInput" value="100" min="16" max="4096" class="bg-transparent border-none text-xs font-medium outline-none w-14 text-right p-0" style="color: var(--fg);">
-                <span class="text-[11px]" style="color: var(--muted);">PX</span>
-              </div>
-            </div>
-            
-            <!-- Download Buttons (099 Primary Buttons) -->
-            <div class="flex gap-2">
-              <button type="button" id="downloadSvgBtn" class="btn-099-primary flex-1 !py-2.5 gap-1.5">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                SVG
-              </button>
-              <button type="button" id="downloadPngBtn" class="btn-099-primary flex-1 !py-2.5 gap-1.5">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                PNG
-              </button>
-              <button type="button" id="downloadJpgBtn" class="btn-099-primary flex-1 !py-2.5 gap-1.5">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                JPG
-              </button>
-            </div>
-            
-            <!-- Code Snippet -->
-            <div class="mt-auto">
-              <pre class="p-3 rounded-[6px] border text-[11px] overflow-x-auto max-w-full font-mono" style="background-color: var(--code-bg); border-color: var(--border-subtle); color: var(--fg);"><code id="codeSnippet"></code></pre>
-              <div class="mt-2 flex flex-col gap-2">
-                <button type="button" id="copyCodeBtn" class="btn-099-secondary w-full !py-2.5 gap-2">
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                  COPY SVG STRING
-                </button>
-                <div class="flex gap-2">
-                  <button type="button" id="copyPngBtn" class="btn-099-secondary flex-1 !py-2.5 gap-1.5">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                    COPY PNG
-                  </button>
-                  <button type="button" id="copyJpgBtn" class="btn-099-secondary flex-1 !py-2.5 gap-1.5">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                    COPY JPG
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
+        <div class="flex items-center gap-1.5">
+          <button type="button" id="deleteIconBtn" class="text-red-500 hover:text-red-600 transition-colors p-1.5 cursor-pointer" title="Delete Icon" aria-label="Delete icon">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+          </button>
+          <button type="button" class="closeModalBtn transition-colors p-1.5 cursor-pointer" style="color: var(--muted-soft);" aria-label="Close icon detail">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
         </div>
       </div>
-    </div>
-  </div>
 
-  <!-- Upload Modal -->
-  <div id="uploadModal" class="fixed inset-0 z-50 hidden transition-opacity duration-500" role="dialog" aria-modal="true" aria-labelledby="uploadModalTitle">
-    <div class="fixed inset-0 bg-black/60 backdrop-blur-md backdrop-modal"></div>
-    <div class="fixed inset-0 z-10 overflow-y-auto flex items-center justify-center p-4">
-      <div class="relative w-full max-w-2xl rounded-[12px] p-8 border shadow-2xl" style="background-color: var(--modal-bg); border-color: var(--border-subtle); color: var(--fg);">
-        <button type="button" class="closeUploadModalBtn absolute top-6 right-6 p-1 transition-colors cursor-pointer" style="color: var(--muted-soft);" aria-label="Close upload modal">
-          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-        </button>
-        <h3 id="uploadModalTitle" class="text-sm font-normal tracking-[0.12em] mb-6" style="color: var(--fg);">UPLOAD ICONS</h3>
-        
-        <form id="uploadForm" class="flex flex-col gap-4">
-          <!-- File Picker -->
-          <div>
-            <label for="uploadFile" class="block text-[11px] tracking-[0.08em] mb-2" style="color: var(--muted);">SELECT SVG FILE(S)</label>
-            <input type="file" id="uploadFile" accept=".svg" multiple class="block w-full text-xs file:mr-3 file:py-2 file:px-3 file:rounded-[4px] file:border-0 file:text-xs file:font-medium transition-colors cursor-pointer border rounded-[6px] p-1" style="background-color: var(--card-bg); border-color: var(--border-subtle); color: var(--fg); file:background-color: var(--fg); file:color: var(--bg);">
+      <div class="flex flex-col md:flex-row gap-6">
+        <!-- Left Column: Big Preview & Tags -->
+        <div class="flex-1 flex flex-col min-w-0">
+          <div class="w-full flex-1 min-h-[220px] flex flex-col items-center justify-center p-6 border rounded-[8px] mb-4 relative" style="background-color: var(--card-bg); border-color: var(--border-subtle);">
+            <div id="modalIconPreview" class="w-24 h-24 mb-3 flex items-center justify-center"></div>
+            <input type="file" id="replaceIconInput" accept=".svg" class="hidden">
+            <button type="button" id="replaceSvgBtn" class="btn-099-secondary !text-[10px] !py-1.5 !px-3 z-10">REPLACE SVG</button>
+            <span id="replaceStatus" role="status" aria-live="polite" class="mt-2 text-[10px] tracking-[0.08em] hidden" style="color: var(--fg);"></span>
           </div>
           
-          <!-- Dynamic Upload List Container -->
-          <div id="uploadItemsContainer" class="flex flex-col gap-2.5 max-h-[50vh] overflow-y-auto pr-1"></div>
-
-          <div id="uploadFooter" class="hidden pt-4 border-t" style="border-color: var(--border-subtle);">
-            <button type="button" id="submitUploadBtn" class="btn-099-primary w-full gap-2 !py-3">
-              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-              UPLOAD
-            </button>
-            <p id="uploadStatus" role="status" aria-live="polite" class="mt-2 text-xs text-center hidden"></p>
+          <div class="w-full text-left">
+            <div class="flex items-center justify-between mb-2">
+              <div id="modalIconTags" class="flex flex-wrap gap-1.5"></div>
+              <div class="relative group flex items-center justify-center">
+                <button type="button" id="editTagsBtn" class="p-1 transition-colors cursor-pointer" style="color: var(--muted-soft);" aria-label="Edit tags">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                  </svg>
+                </button>
+                <div class="absolute bottom-full mb-2 right-0 px-2 py-1 text-[10px] tracking-[0.08em] rounded-[4px] invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none whitespace-nowrap z-50" style="background-color: var(--fg); color: var(--bg);">EDIT TAGS</div>
+              </div>
+            </div>
+            
+            <div id="editTagsForm" class="hidden opacity-0 transition-opacity duration-200 p-3 rounded-[6px] border mb-2" style="background-color: var(--card-bg); border-color: var(--border-subtle);">
+              <label for="editTagsInput" class="block text-[10px] tracking-[0.08em] mb-1.5" style="color: var(--muted);">TAGS (COMMA SEPARATED)</label>
+              <div class="flex gap-2">
+                <input type="text" id="editTagsInput" class="flex-1 border rounded-[6px] px-2.5 py-1.5 text-xs outline-none" style="background-color: var(--card-bg); border-color: var(--border-subtle); color: var(--fg);">
+                <button type="button" id="saveTagsBtn" class="btn-099-primary !py-1.5 !px-3 !text-[10px]">SAVE</button>
+              </div>
+              <p id="editTagsStatus" role="status" aria-live="polite" class="mt-2 text-xs hidden text-center"></p>
+            </div>
           </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- Delete Prompt Modal -->
-  <div id="deleteModal" class="fixed inset-0 z-50 hidden transition-opacity duration-500" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle">
-    <div class="fixed inset-0 bg-black/60 backdrop-blur-md backdrop-modal"></div>
-    <div class="fixed inset-0 z-10 flex items-center justify-center p-4">
-      <div class="relative w-full max-w-xs rounded-[12px] p-6 border text-center shadow-2xl" style="background-color: var(--modal-bg); border-color: var(--border-subtle); color: var(--fg);">
-        <h3 id="deleteModalTitle" class="text-sm font-normal tracking-[0.12em] mb-2" style="color: var(--fg);">DELETE ICON</h3>
-        <p class="text-xs tracking-[0.08em] mb-6" style="color: var(--muted);">ARE YOU SURE YOU WANT TO PERMANENTLY DELETE THIS ICON?</p>
-        <div class="flex flex-col gap-2">
-          <button type="button" id="confirmDeleteBtn" class="btn-099-primary !bg-red-600 !border-red-600 hover:!bg-red-700 w-full !text-white">DELETE ICON</button>
-          <button type="button" class="closeDeleteModalBtn btn-099-secondary w-full">CANCEL</button>
         </div>
-        <p id="deleteStatus" role="status" aria-live="polite" class="mt-2 text-xs hidden"></p>
+
+        <!-- Right Column: Export Tools -->
+        <div class="flex-1 flex flex-col gap-3.5 min-w-0">
+          <!-- Preset Sizes -->
+          <div class="flex items-end justify-center gap-3 pb-3 border-b" style="border-color: var(--border-subtle);">
+            <button type="button" class="preset-size-btn group flex flex-col items-center gap-1.5 transition-colors cursor-pointer" style="color: var(--muted-soft);" data-size="50">
+              <div class="preset-box border rounded-[6px] flex items-center justify-center transition-colors overflow-hidden" style="width: 46px; height: 46px; background-color: var(--card-bg); border-color: var(--border-subtle);">
+                <div class="preset-icon-container w-full h-full p-2 flex items-center justify-center"></div>
+              </div>
+              <span class="text-[10px] tracking-[0.08em]">50PX</span>
+            </button>
+            <button type="button" class="preset-size-btn group flex flex-col items-center gap-1.5 transition-colors cursor-pointer" style="color: var(--muted-soft);" data-size="75">
+              <div class="preset-box border rounded-[6px] flex items-center justify-center transition-colors overflow-hidden" style="width: 68px; height: 68px; background-color: var(--card-bg); border-color: var(--border-subtle);">
+                <div class="preset-icon-container w-full h-full p-2.5 flex items-center justify-center"></div>
+              </div>
+              <span class="text-[10px] tracking-[0.08em]">75PX</span>
+            </button>
+            <button type="button" class="preset-size-btn group flex flex-col items-center gap-1.5 transition-colors cursor-pointer" style="color: var(--fg);" data-size="100">
+              <div class="preset-box border-2 rounded-[6px] flex items-center justify-center overflow-hidden shadow-xs" style="width: 88px; height: 88px; background-color: var(--card-bg); border-color: var(--fg);">
+                <div class="preset-icon-container w-full h-full p-3 flex items-center justify-center"></div>
+              </div>
+              <span class="text-[10px] tracking-[0.08em] font-medium" style="color: var(--fg);">100PX</span>
+            </button>
+          </div>
+
+          <!-- Custom Size Input -->
+          <div class="flex items-center justify-between border rounded-[6px] px-3 py-2 transition-colors" style="background-color: var(--card-bg); border-color: var(--border-subtle);">
+            <label for="exportSizeInput" class="text-[11px] tracking-[0.08em] whitespace-nowrap" style="color: var(--muted);">EXPORT SIZE</label>
+            <div class="flex items-center gap-1">
+              <input type="number" id="exportSizeInput" value="100" min="16" max="4096" class="bg-transparent border-none text-xs font-medium outline-none w-14 text-right p-0" style="color: var(--fg);">
+              <span class="text-[11px]" style="color: var(--muted);">PX</span>
+            </div>
+          </div>
+          
+          <!-- Download Buttons (099 Primary Buttons) -->
+          <div class="flex gap-2">
+            <button type="button" id="downloadSvgBtn" class="btn-099-primary flex-1 !py-2.5 gap-1.5">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+              SVG
+            </button>
+            <button type="button" id="downloadPngBtn" class="btn-099-primary flex-1 !py-2.5 gap-1.5">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+              PNG
+            </button>
+            <button type="button" id="downloadJpgBtn" class="btn-099-primary flex-1 !py-2.5 gap-1.5">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+              JPG
+            </button>
+          </div>
+          
+          <!-- Code Snippet -->
+          <div class="mt-auto">
+            <pre class="p-3 rounded-[6px] border text-[11px] overflow-x-auto max-w-full font-mono" style="background-color: var(--code-bg); border-color: var(--border-subtle); color: var(--fg);"><code id="codeSnippet"></code></pre>
+            <div class="mt-2 flex flex-col gap-2">
+              <button type="button" id="copyCodeBtn" class="btn-099-secondary w-full !py-2.5 gap-2">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                COPY SVG STRING
+              </button>
+              <div class="flex gap-2">
+                <button type="button" id="copyPngBtn" class="btn-099-secondary flex-1 !py-2.5 gap-1.5">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                  COPY PNG
+                </button>
+                <button type="button" id="copyJpgBtn" class="btn-099-secondary flex-1 !py-2.5 gap-1.5">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                  COPY JPG
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
+  </dialog>
+
+  <!-- Upload Modal (native HTML5 <dialog>) -->
+  <dialog id="uploadModal" class="outline-none p-0 bg-transparent border-0 max-w-2xl w-full max-h-[95vh] overflow-y-auto" aria-labelledby="uploadModalTitle">
+    <div class="relative w-full rounded-[12px] p-8 border shadow-2xl" style="background-color: var(--modal-bg); border-color: var(--border-subtle); color: var(--fg);">
+      <button type="button" class="closeUploadModalBtn absolute top-6 right-6 p-1 transition-colors cursor-pointer" style="color: var(--muted-soft);" aria-label="Close upload modal">
+        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+      </button>
+      <h3 id="uploadModalTitle" class="text-sm font-normal tracking-[0.12em] mb-6" style="color: var(--fg);">UPLOAD ICONS</h3>
+      
+      <form id="uploadForm" class="flex flex-col gap-4">
+        <!-- File Picker -->
+        <div>
+          <label for="uploadFile" class="block text-[11px] tracking-[0.08em] mb-2" style="color: var(--muted);">SELECT SVG FILE(S)</label>
+          <input type="file" id="uploadFile" accept=".svg" multiple class="block w-full text-xs file:mr-3 file:py-2 file:px-3 file:rounded-[4px] file:border-0 file:text-xs file:font-medium transition-colors cursor-pointer border rounded-[6px] p-1" style="background-color: var(--card-bg); border-color: var(--border-subtle); color: var(--fg); file:background-color: var(--fg); file:color: var(--bg);">
+        </div>
+        
+        <!-- Dynamic Upload List Container -->
+        <div id="uploadItemsContainer" class="flex flex-col gap-2.5 max-h-[50vh] overflow-y-auto pr-1"></div>
+
+        <div id="uploadFooter" class="hidden pt-4 border-t" style="border-color: var(--border-subtle);">
+          <button type="button" id="submitUploadBtn" class="btn-099-primary w-full gap-2 !py-3">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+            UPLOAD
+          </button>
+          <p id="uploadStatus" role="status" aria-live="polite" class="mt-2 text-xs text-center hidden"></p>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- Delete Prompt Modal (native HTML5 <dialog>) -->
+  <dialog id="deleteModal" class="outline-none p-0 bg-transparent border-0 max-w-xs w-full" aria-labelledby="deleteModalTitle">
+    <div class="relative w-full rounded-[12px] p-6 border text-center shadow-2xl" style="background-color: var(--modal-bg); border-color: var(--border-subtle); color: var(--fg);">
+      <h3 id="deleteModalTitle" class="text-sm font-normal tracking-[0.12em] mb-2" style="color: var(--fg);">DELETE ICON</h3>
+      <p class="text-xs tracking-[0.08em] mb-6" style="color: var(--muted);">ARE YOU SURE YOU WANT TO PERMANENTLY DELETE THIS ICON?</p>
+      <div class="flex flex-col gap-2">
+        <button type="button" id="confirmDeleteBtn" class="btn-099-primary !bg-red-600 !border-red-600 hover:!bg-red-700 w-full !text-white">DELETE ICON</button>
+        <button type="button" class="closeDeleteModalBtn btn-099-secondary w-full">CANCEL</button>
+      </div>
+      <p id="deleteStatus" role="status" aria-live="polite" class="mt-2 text-xs hidden"></p>
+    </div>
+  </dialog>
 
   <!-- Floating Multiselect Action Bar -->
   <div id="multiselectBar" class="fixed bottom-8 left-1/2 -translate-x-1/2 border shadow-2xl rounded-[8px] px-6 py-3.5 flex items-center gap-6 z-40 transition-transform duration-300 translate-y-32" style="background-color: var(--modal-bg); border-color: var(--border-subtle);">
@@ -640,6 +634,6 @@
     <button type="button" id="multiselectDeleteBtn" class="btn-099-primary !bg-red-600 !border-red-600 hover:!bg-red-700 !py-1.5 !px-3 !text-[11px] !text-white">DELETE</button>
   </div>
 
-  <script src="app.js?v=3.6.0"></script>
+  <script src="app.js?v=3.7.7"></script>
 </body>
 </html>

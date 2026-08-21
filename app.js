@@ -30,8 +30,10 @@ const Theme = {
     document.querySelectorAll('.theme-btn').forEach(btn => {
       if (btn.dataset.theme === theme) {
         btn.classList.add('is-active');
+        btn.setAttribute('aria-checked', 'true');
       } else {
         btn.classList.remove('is-active');
+        btn.setAttribute('aria-checked', 'false');
       }
     });
   }
@@ -442,7 +444,7 @@ function openModal(id) {
   updateCodeSnippet();
 
   _lastFocusedElement = document.activeElement;
-  DOM.iconModal.classList.remove('hidden');
+  if (DOM.iconModal) DOM.iconModal.showModal();
   document.body.style.overflow = 'hidden';
 
   setTimeout(() => {
@@ -458,14 +460,14 @@ function closeModals() {
     DOM.iconDrawer.classList.remove('scale-100', 'opacity-100');
     DOM.iconDrawer.classList.add('scale-95', 'opacity-0');
     setTimeout(() => {
-      DOM.iconModal?.classList.add('hidden');
+      if (DOM.iconModal && DOM.iconModal.open) DOM.iconModal.close();
     }, 250);
   } else {
-    DOM.iconModal?.classList.add('hidden');
+    if (DOM.iconModal && DOM.iconModal.open) DOM.iconModal.close();
   }
 
-  DOM.uploadModal?.classList.add('hidden');
-  DOM.deleteModal?.classList.add('hidden');
+  if (DOM.uploadModal && DOM.uploadModal.open) DOM.uploadModal.close();
+  if (DOM.deleteModal && DOM.deleteModal.open) DOM.deleteModal.close();
   document.body.style.overflow = '';
   if (DOM.uploadStatus) DOM.uploadStatus.classList.add('hidden');
   if (DOM.deleteStatus) DOM.deleteStatus.classList.add('hidden');
@@ -973,15 +975,15 @@ function setupEventListeners() {
 
   // Upload modal trigger
   DOM.openUploadModalBtn?.addEventListener('click', () => {
-    DOM.uploadModal.classList.remove('hidden');
+    if (DOM.uploadModal) DOM.uploadModal.showModal();
     document.body.style.overflow = 'hidden';
   });
 
   // Delete modal trigger
   DOM.deleteIconBtn?.addEventListener('click', () => {
     if (!currentIcon) return;
-    DOM.iconModal.classList.add('hidden');
-    DOM.deleteModal.classList.remove('hidden');
+    if (DOM.iconModal && DOM.iconModal.open) DOM.iconModal.close();
+    if (DOM.deleteModal) DOM.deleteModal.showModal();
   });
 
   DOM.confirmDeleteBtn?.addEventListener('click', async () => {
@@ -1444,6 +1446,18 @@ function setupEventListeners() {
       }
     });
   }
+
+  // Dynamic Scroll Shadow for Sticky Search Bar
+  window.addEventListener('scroll', () => {
+    const stickyHeader = document.getElementById('stickySearchHeader');
+    if (stickyHeader) {
+      if (window.scrollY > 5) {
+        stickyHeader.classList.add('shadow-[0_10px_20px_-10px_rgba(0,0,0,0.15)]');
+      } else {
+        stickyHeader.classList.remove('shadow-[0_10px_20px_-10px_rgba(0,0,0,0.15)]');
+      }
+    }
+  });
 }
 
 // ── Authentication Initialization ────────────────────────────────────────────
