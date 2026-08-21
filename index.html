@@ -389,56 +389,56 @@
             <span class="hidden sm:inline">UPLOAD</span>
           </button>
         </div>
+         </header>
+ 
+    <!-- Sticky Search and Controls Header (Sticks below main header, full width layout) -->
+    <div id="stickySearchHeader" class="sticky top-[61px] z-20 w-full px-6 sm:px-10 lg:px-12 pt-4 pb-4 border-b flex items-center gap-3 transition-shadow duration-200" style="background-color: var(--bg); border-color: var(--border-subtle);">
+      <!-- Search Input -->
+      <div class="flex-1 relative" role="search">
+        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+          <svg class="w-4 h-4" style="color: var(--muted-soft);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </div>
+        <input type="text" id="searchInput" class="block w-full pl-11 pr-10 py-3.5 border rounded-[6px] text-xs tracking-[0.08em] focus:outline-none transition-colors" style="background-color: var(--card-bg); border-color: var(--border-subtle); color: var(--fg);" placeholder="SEARCH ICONS..." aria-label="Search icons">
+        <button type="button" id="clearSearchBtn" class="absolute inset-y-0 right-0 pr-4 flex items-center hidden transition-colors cursor-pointer" style="color: var(--muted-soft);" aria-label="Clear search">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
       </div>
-    </header>
+
+      <!-- Sort Select Wrapper (Icon only) -->
+      <div class="relative w-11 h-11 border rounded-[6px] flex items-center justify-center transition-colors shrink-0" style="background-color: var(--card-bg); border-color: var(--border-subtle);" title="Sort Order">
+        <!-- Sort icon (descending lines) -->
+        <svg class="w-4 h-4" style="color: var(--muted);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 4h18M3 10h14M3 16h10M3 22h6" />
+        </svg>
+        <label for="sortSelect" class="sr-only">Sort Order</label>
+        <select id="sortSelect" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" aria-label="Sort order">
+          <option value="newest">SORT: NEWEST</option>
+          <option value="oldest">SORT: OLDEST</option>
+          <option value="az">SORT: A TO Z</option>
+          <option value="za">SORT: Z TO A</option>
+        </select>
+      </div>
+
+      <!-- Grid Size Select Wrapper (Icon only) -->
+      <div class="relative w-11 h-11 border rounded-[6px] flex items-center justify-center transition-colors shrink-0" style="background-color: var(--card-bg); border-color: var(--border-subtle);" title="Grid Size">
+        <!-- Grid icon (4 squares) -->
+        <svg class="w-4 h-4" style="color: var(--muted);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+          <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+          <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+          <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+        </svg>
+        <label for="gridSizeSelect" class="sr-only">Grid Size</label>
+        <select id="gridSizeSelect" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" aria-label="Grid size">
+          <option value="50">GRID: SMALL (50PX)</option>
+          <option value="75" selected>GRID: MEDIUM (75PX)</option>
+          <option value="100">GRID: LARGE (100PX)</option>
+        </select>
+      </div>
+    </div>
 
     <!-- Main Content Area (099 Full-Width Edge-to-Edge Fluid Layout) -->
     <main class="w-full flex-1 px-6 sm:px-10 lg:px-12 py-8">
-      <!-- Sticky Search and Controls Header (Sticks below main header, matching theme canvas) -->
-      <div id="stickySearchHeader" class="sticky top-[61px] z-20 w-full pt-4 pb-4 mb-8 flex items-center gap-3 transition-shadow duration-200" style="background-color: var(--bg);">
-        <!-- Search Input -->
-        <div class="flex-1 relative" role="search">
-          <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-            <svg class="w-4 h-4" style="color: var(--muted-soft);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-          </div>
-          <input type="text" id="searchInput" class="block w-full pl-11 pr-10 py-3.5 border rounded-[6px] text-xs tracking-[0.08em] focus:outline-none transition-colors" style="background-color: var(--card-bg); border-color: var(--border-subtle); color: var(--fg);" placeholder="SEARCH ICONS..." aria-label="Search icons">
-          <button type="button" id="clearSearchBtn" class="absolute inset-y-0 right-0 pr-4 flex items-center hidden transition-colors cursor-pointer" style="color: var(--muted-soft);" aria-label="Clear search">
-            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-          </button>
-        </div>
-
-        <!-- Sort Select Wrapper (Icon only) -->
-        <div class="relative w-11 h-11 border rounded-[6px] flex items-center justify-center transition-colors shrink-0" style="background-color: var(--card-bg); border-color: var(--border-subtle);" title="Sort Order">
-          <!-- Sort icon (descending lines) -->
-          <svg class="w-4 h-4" style="color: var(--muted);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3 4h18M3 10h14M3 16h10M3 22h6" />
-          </svg>
-          <label for="sortSelect" class="sr-only">Sort Order</label>
-          <select id="sortSelect" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" aria-label="Sort order">
-            <option value="newest">SORT: NEWEST</option>
-            <option value="oldest">SORT: OLDEST</option>
-            <option value="az">SORT: A TO Z</option>
-            <option value="za">SORT: Z TO A</option>
-          </select>
-        </div>
-
-        <!-- Grid Size Select Wrapper (Icon only) -->
-        <div class="relative w-11 h-11 border rounded-[6px] flex items-center justify-center transition-colors shrink-0" style="background-color: var(--card-bg); border-color: var(--border-subtle);" title="Grid Size">
-          <!-- Grid icon (4 squares) -->
-          <svg class="w-4 h-4" style="color: var(--muted);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <rect x="3" y="3" width="7" height="7" rx="1"></rect>
-            <rect x="14" y="3" width="7" height="7" rx="1"></rect>
-            <rect x="14" y="14" width="7" height="7" rx="1"></rect>
-            <rect x="3" y="14" width="7" height="7" rx="1"></rect>
-          </svg>
-          <label for="gridSizeSelect" class="sr-only">Grid Size</label>
-          <select id="gridSizeSelect" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" aria-label="Grid size">
-            <option value="50">GRID: SMALL (50PX)</option>
-            <option value="75" selected>GRID: MEDIUM (75PX)</option>
-            <option value="100">GRID: LARGE (100PX)</option>
-          </select>
-        </div>
-      </div>
       
       <!-- Fluid Grid -->
       <div id="iconGrid" class="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-6 w-full"></div>
@@ -634,6 +634,6 @@
     <button type="button" id="multiselectDeleteBtn" class="btn-099-primary !bg-red-600 !border-red-600 hover:!bg-red-700 !py-1.5 !px-3 !text-[11px] !text-white">DELETE</button>
   </div>
 
-  <script src="app.js?v=3.7.7"></script>
+  <script src="app.js?v=3.7.8"></script>
 </body>
 </html>
