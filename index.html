@@ -363,12 +363,12 @@
     <header class="backdrop-blur-xl border-b sticky top-0 z-30 w-full" style="background-color: var(--header-bg); border-color: var(--border-subtle);">
       <div class="w-full px-6 sm:px-10 lg:px-12 py-4 flex items-center justify-between">
         <!-- Logo -->
-        <div class="flex items-center gap-3">
-          <div class="w-7 h-7 rounded-[6px] flex items-center justify-center" style="background-color: var(--fg); color: var(--bg);">
+        <button type="button" id="siteLogo" class="flex items-center gap-3 cursor-pointer select-none bg-transparent border-0 p-0 text-left outline-none">
+          <div class="w-7 h-7 rounded-[6px] flex items-center justify-center pointer-events-none" style="background-color: var(--fg); color: var(--bg);">
             <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect></svg>
           </div>
-          <h1 class="text-sm font-medium tracking-[0.12em]" style="color: var(--fg);">ICON LIBRARY</h1>
-        </div>
+          <h1 class="text-sm font-medium tracking-[0.12em] pointer-events-none" style="color: var(--fg);">ICON LIBRARY</h1>
+        </button>
 
         <div class="flex items-center gap-4">
           <!-- 5-Theme Switcher -->
@@ -630,6 +630,6 @@
     <button type="button" id="multiselectDeleteBtn" class="btn-099-primary !bg-red-600 !border-red-600 hover:!bg-red-700 !py-1.5 !px-3 !text-[11px] !text-white">DELETE</button>
   </div>
 
-  <script src="app.js?v=3.3.0"></script>
+  <script src="app.js?v=3.4.0"></script>
 </body>
 </html>

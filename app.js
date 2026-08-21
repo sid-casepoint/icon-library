@@ -91,6 +91,7 @@ const DOM = {
   loginBtn: document.getElementById('loginBtn'),
   loginError: document.getElementById('loginError'),
   appContent: document.getElementById('appContent'),
+  siteLogo: document.getElementById('siteLogo'),
   iconGrid: document.getElementById('iconGrid'),
   iconCount: document.getElementById('iconCount'),
   searchInput: document.getElementById('searchInput'),
@@ -744,6 +745,26 @@ function updatePresetSelectionUI(size) {
 function setupEventListeners() {
   if (_eventsInitialized) return;
   _eventsInitialized = true;
+
+  // Site Logo Reset click handler
+  DOM.siteLogo?.addEventListener('click', () => {
+    updateSearch('', true);
+    
+    if (DOM.sortSelect) {
+      DOM.sortSelect.value = 'newest';
+      localStorage.setItem('sortPref', 'newest');
+    }
+    
+    if (DOM.gridSizeSelect) {
+      DOM.gridSizeSelect.value = '75';
+      localStorage.setItem('gridSizePref', '75');
+    }
+    
+    selectedIcons.clear();
+    updateMultiselectUI();
+    closeModals();
+    renderIcons();
+  });
 
   // Theme Switcher buttons
   document.querySelectorAll('.theme-btn').forEach(btn => {
