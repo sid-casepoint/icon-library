@@ -111,7 +111,7 @@ for (const file of svgFiles) {
   // Tag extraction
   const nameParts = name.toLowerCase().split(/[-_]/);
   const extraTags = TAG_SYNONYMS[name] || [];
-  const tags = Array.from(new Set([...nameParts, category.toLowerCase(), ...extraTags]));
+  const tags = Array.from(new Set([...nameParts, ...extraTags]));
 
   // Inner content & ViewBox extraction
   const innerContent = optimizedSvg.replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, '');
