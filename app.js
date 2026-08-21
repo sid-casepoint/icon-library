@@ -390,9 +390,25 @@ function updateMultiselectUI() {
 function renderModalTags() {
   if (!currentIcon) return;
   const tags = Array.isArray(currentIcon.tags) ? currentIcon.tags : [];
-  DOM.modalIconTags.innerHTML = tags.map(tag => `
-    <button type="button" class="tag-btn btn-099-secondary !py-1.5 !px-2.5 !text-[11px] !rounded-[6px]" data-tag="${escapeAttribute(tag)}">${escapeAttribute(tag)}</button>
-  `).join('');
+  
+  if (tags.length === 0) {
+    DOM.modalIconTags.innerHTML = `
+      <button type="button" id="addTagsPlaceholderBtn" class="btn-099-secondary !py-1.5 !px-2.5 !text-[11px] !rounded-[6px] flex items-center gap-1">
+        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+        ADD TAGS
+      </button>
+    `;
+    if (DOM.editTagsBtn) {
+      DOM.editTagsBtn.parentElement.classList.add('hidden');
+    }
+  } else {
+    DOM.modalIconTags.innerHTML = tags.map(tag => `
+      <button type="button" class="tag-btn btn-099-secondary !py-1.5 !px-2.5 !text-[11px] !rounded-[6px]" data-tag="${escapeAttribute(tag)}">${escapeAttribute(tag)}</button>
+    `).join('');
+    if (DOM.editTagsBtn) {
+      DOM.editTagsBtn.parentElement.classList.remove('hidden');
+    }
+  }
 }
 
 function openModal(id) {
@@ -786,6 +802,11 @@ function setupEventListeners() {
 
   // Modal tags delegation
   DOM.modalIconTags?.addEventListener('click', (e) => {
+    const addBtn = e.target.closest('#addTagsPlaceholderBtn');
+    if (addBtn) {
+      toggleEditTags();
+      return;
+    }
     const tagBtn = e.target.closest('.tag-btn');
     if (!tagBtn) return;
     const tag = tagBtn.dataset.tag;
