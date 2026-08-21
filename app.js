@@ -1,6 +1,6 @@
 /**
  * Icon Library - Production Architecture
- * 099 Styleguide Compliant, In-Memory Security with Session Persistence, WCAG Compliant
+ * 099 Styleguide Compliant, 5-Theme Engine, Session Auth, WCAG Compliant
  */
 
 // ── Application State ─────────────────────────────────────────────────────────
@@ -11,6 +11,31 @@ const selectedIcons = new Set();
 let _lastFocusedElement = null;
 let _searchDebounceTimer = null;
 let _eventsInitialized = false;
+
+// ── Theme Engine ──────────────────────────────────────────────────────────────
+const Theme = {
+  current: 'light',
+  init() {
+    const saved = localStorage.getItem('themePref') || 'light';
+    this.set(saved);
+  },
+  set(themeName) {
+    const validThemes = ['light', 'dark', 'beige', 'yellow', 'blue'];
+    const theme = validThemes.includes(themeName) ? themeName : 'light';
+    this.current = theme;
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('themePref', theme);
+
+    // Update switcher active state
+    document.querySelectorAll('.theme-btn').forEach(btn => {
+      if (btn.dataset.theme === theme) {
+        btn.classList.add('is-active');
+      } else {
+        btn.classList.remove('is-active');
+      }
+    });
+  }
+};
 
 // ── Secure Session Authentication ─────────────────────────────────────────────
 const Auth = (() => {
@@ -56,12 +81,6 @@ const ENCRYPTED_TOKEN_DATA = Object.freeze({
   iv: '15d1093d5fcd448595da8a0e',
   authTag: '817580232c0ce33889e31446d515bb71',
   ciphertext: '68d790ad8fd2d004ac1f1d163712e6b3f1e4e3f8ca99a4acf8ecab665b34eddb21fefc442549675a2b690e674109a57588f0a79884c9b90350306402be3963c2db9b03c6efc0f4b72337b3473d7eb57580dc5f482c65d879459d3734cd'
-});
-
-const SVG_PURIFY_CONFIG = Object.freeze({
-  USE_PROFILES: { svg: true, svgFilters: true },
-  FORBID_TAGS: ['script', 'use', 'foreignObject'],
-  FORBID_ATTR: ['onload', 'onerror', 'onclick', 'onmouseover', 'href']
 });
 
 // ── DOM References ───────────────────────────────────────────────────────────
@@ -123,11 +142,24 @@ const DOM = {
 };
 
 // ── Helper Utilities ──────────────────────────────────────────────────────────
-function safeSanitizeSVG(svgString) {
-  if (typeof DOMPurify !== 'undefined') {
-    return DOMPurify.sanitize(svgString, SVG_PURIFY_CONFIG);
-  }
-  return svgString || '';
+
+// Convert raw SVG string to a data: URI for pixel-perfect <img> rendering.
+// This provides complete sandboxing — no CSS leaks, no DOM interference.
+function svgToImgSrc(svgString) {
+  if (!svgString) return '';
+  const encoded = btoa(unescape(encodeURIComponent(svgString)));
+  return `data:image/svg+xml;base64,${encoded}`;
+}
+
+function minifySVG(svgString) {
+  if (!svgString) return '';
+  return svgString
+    .replace(/<!--[\s\S]*?-->/g, '')
+    .replace(/>\s+</g, '><')
+    .replace(/\s+/g, ' ')
+    .replace(/\s*([{}:;,>])\s*/g, '$1')
+    .replace(/;\s*}/g, '}')
+    .trim();
 }
 
 function bytesToBase64(bytes) {
@@ -241,6 +273,7 @@ async function fetchIconIndex() {
 
 // ── Application Initialization ───────────────────────────────────────────────
 async function init() {
+  Theme.init();
   try {
     const serverIcons = await fetchIconIndex();
     iconsData = reconcileLocalState(serverIcons);
@@ -309,7 +342,7 @@ function renderIcons() {
     const iconId = icon.id || icon.name || 'icon';
     const iconName = icon.name || iconId;
     const isSelected = selectedIcons.has(iconId);
-    const sanitizedSvg = safeSanitizeSVG(icon.svg || '');
+    const imgSrc = svgToImgSrc(icon.svg || '');
 
     return `
       <div class="relative group" data-icon-id="${escapeAttribute(iconId)}">
@@ -320,7 +353,7 @@ function renderIcons() {
                 role="checkbox"
                 aria-checked="${isSelected}"
                 aria-label="Select icon ${escapeAttribute(iconName)}">
-          <svg class="w-2.5 h-2.5 text-white pointer-events-none" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+          <svg class="w-2.5 h-2.5 pointer-events-none" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
         </button>
 
         <button type="button" 
@@ -328,10 +361,8 @@ function renderIcons() {
                 data-action="open"
                 data-id="${escapeAttribute(iconId)}" 
                 aria-label="View details for ${escapeAttribute(iconName)}">
-          <div class="w-full flex-1 flex items-center justify-center text-[#101010] relative pointer-events-none">
-            <div style="width: ${iconSize}px; height: ${iconSize}px;" class="flex items-center justify-center pointer-events-none text-[#101010]">
-              ${sanitizedSvg}
-            </div>
+          <div class="w-full flex-1 flex items-center justify-center relative pointer-events-none p-4">
+            <img src="${imgSrc}" alt="${escapeAttribute(iconName)}" style="width: ${iconSize}px; height: ${iconSize}px; object-fit: contain;" class="pointer-events-none" />
           </div>
           <div class="icon-card-footer pointer-events-none">
             <span class="truncate w-full text-center">${escapeAttribute(iconName)}</span>
@@ -376,15 +407,13 @@ function openModal(id) {
   if (DOM.editTagsInput) DOM.editTagsInput.value = (currentIcon.tags || []).join(', ');
   if (DOM.replaceStatus) DOM.replaceStatus.classList.add('hidden');
 
-  const sanitized = safeSanitizeSVG(currentIcon.svg || '');
-  DOM.modalIconPreview.innerHTML = sanitized;
+  const imgSrc = svgToImgSrc(currentIcon.svg || '');
+  DOM.modalIconPreview.innerHTML = `<img src="${imgSrc}" alt="${escapeAttribute(currentIcon.name)}" style="max-width: 100%; max-height: 100%; object-fit: contain;" />`;
 
   document.querySelectorAll('.preset-icon-container').forEach(container => {
-    container.innerHTML = sanitized;
+    container.innerHTML = `<img src="${imgSrc}" alt="${escapeAttribute(currentIcon.name)}" style="width: 100%; height: 100%; object-fit: contain;" />`;
   });
 
-  DOM.modalIconPreview.style.width = '80px';
-  DOM.modalIconPreview.style.height = '80px';
   updateCodeSnippet();
 
   _lastFocusedElement = document.activeElement;
@@ -422,7 +451,7 @@ function closeModals() {
 
 function updateCodeSnippet() {
   if (!currentIcon) return;
-  DOM.codeSnippet.textContent = currentIcon.svg || '';
+  DOM.codeSnippet.textContent = minifySVG(currentIcon.svg || '');
 }
 
 function toggleEditTags() {
@@ -532,7 +561,6 @@ async function pushToGitHub(path, content, message, sha = null) {
 function downloadImage(format) {
   if (!currentIcon) return;
   const size = parseInt(DOM.exportSizeInput.value, 10) || 512;
-  const color = '#101010';
 
   const canvas = document.createElement('canvas');
   canvas.width = size;
@@ -544,9 +572,11 @@ function downloadImage(format) {
     ctx.fillRect(0, 0, size, size);
   }
 
-  const svgData = (currentIcon.svg || '')
-    .replace('<svg', `<svg width="${size}" height="${size}" style="color: ${color}"`)
-    .replace(/currentColor/g, color);
+  // Ensure SVG has proper dimensions for rasterization
+  let svgData = currentIcon.svg || '';
+  if (!svgData.includes('width=') && !svgData.includes('height=')) {
+    svgData = svgData.replace('<svg', `<svg width="${size}" height="${size}"`);
+  }
 
   const blob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
   const url = URL.createObjectURL(blob);
@@ -601,11 +631,15 @@ function renderUploadItems() {
 
   selectedUploadFiles.forEach((item, index) => {
     const row = document.createElement('div');
-    row.className = 'flex items-center gap-4 p-3.5 bg-[#fafafa] border border-[#e0e0e0] rounded-[8px]';
+    row.className = 'flex items-center gap-4 p-3.5 border rounded-[8px]';
+    row.style.backgroundColor = 'var(--sub-bg)';
+    row.style.borderColor = 'var(--border-subtle)';
 
     const previewBox = document.createElement('div');
-    previewBox.className = 'w-12 h-12 shrink-0 p-2 flex items-center justify-center border border-[#e0e0e0] rounded-[6px] bg-white text-[#101010] overflow-hidden';
-    previewBox.innerHTML = safeSanitizeSVG(item.svgContent);
+    previewBox.className = 'w-12 h-12 shrink-0 p-2 flex items-center justify-center border rounded-[6px] overflow-hidden';
+    previewBox.style.backgroundColor = 'var(--card-bg)';
+    previewBox.style.borderColor = 'var(--border-subtle)';
+    previewBox.innerHTML = `<img src="${svgToImgSrc(item.svgContent)}" alt="preview" style="width: 100%; height: 100%; object-fit: contain;" />`;
 
     const inputsCol = document.createElement('div');
     inputsCol.className = 'flex-1 flex gap-3';
@@ -614,7 +648,10 @@ function renderUploadItems() {
     nameInput.type = 'text';
     nameInput.value = item.name;
     nameInput.placeholder = 'Icon Name';
-    nameInput.className = 'flex-1 px-3 py-2 text-xs border border-[#e0e0e0] rounded-[6px] bg-white focus:outline-none focus:border-[#101010] text-[#101010]';
+    nameInput.className = 'flex-1 px-3 py-2 text-xs border rounded-[6px] outline-none';
+    nameInput.style.backgroundColor = 'var(--card-bg)';
+    nameInput.style.borderColor = 'var(--border-subtle)';
+    nameInput.style.color = 'var(--fg)';
 
     nameInput.addEventListener('input', (e) => {
       const val = e.target.value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '-');
@@ -624,11 +661,9 @@ function renderUploadItems() {
                       selectedUploadFiles.filter((_, i) => i !== index).some(it => it.name === val);
 
       if (isClash) {
-        nameInput.classList.add('border-red-500', 'text-red-500');
-        nameInput.classList.remove('border-[#e0e0e0]', 'focus:border-[#101010]', 'text-[#101010]');
+        nameInput.style.borderColor = '#ef4444';
       } else {
-        nameInput.classList.remove('border-red-500', 'text-red-500');
-        nameInput.classList.add('border-[#e0e0e0]', 'focus:border-[#101010]', 'text-[#101010]');
+        nameInput.style.borderColor = 'var(--border-subtle)';
       }
     });
 
@@ -636,7 +671,10 @@ function renderUploadItems() {
     tagsInput.type = 'text';
     tagsInput.value = item.tags;
     tagsInput.placeholder = 'Tags (comma separated)';
-    tagsInput.className = 'flex-1 px-3 py-2 text-xs border border-[#e0e0e0] rounded-[6px] bg-white focus:outline-none focus:border-[#101010] text-[#101010]';
+    tagsInput.className = 'flex-1 px-3 py-2 text-xs border rounded-[6px] outline-none';
+    tagsInput.style.backgroundColor = 'var(--card-bg)';
+    tagsInput.style.borderColor = 'var(--border-subtle)';
+    tagsInput.style.color = 'var(--fg)';
     tagsInput.addEventListener('input', (e) => {
       selectedUploadFiles[index].tags = e.target.value;
     });
@@ -646,7 +684,7 @@ function renderUploadItems() {
 
     const removeBtn = document.createElement('button');
     removeBtn.type = 'button';
-    removeBtn.className = 'shrink-0 p-2 text-[#555555] hover:text-red-600 transition-colors cursor-pointer';
+    removeBtn.className = 'shrink-0 p-2 text-red-500 hover:text-red-600 transition-colors cursor-pointer';
     removeBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>`;
     removeBtn.addEventListener('click', () => {
       selectedUploadFiles.splice(index, 1);
@@ -667,17 +705,15 @@ function updatePresetSelectionUI(size) {
     const box = b.querySelector('.preset-box');
     const span = b.querySelector('span');
     if (b.dataset.size === String(size)) {
-      b.classList.remove('text-[#999999]');
-      b.classList.add('text-[#101010]');
-      box?.classList.remove('border', 'border-[#e0e0e0]', 'bg-white');
-      box?.classList.add('border-2', 'border-[#101010]', 'bg-white', 'shadow-xs');
-      span?.classList.add('font-medium', 'text-[#101010]');
+      b.style.color = 'var(--fg)';
+      box.style.borderWidth = '2px';
+      box.style.borderColor = 'var(--fg)';
+      span?.classList.add('font-medium');
     } else {
-      b.classList.remove('text-[#101010]');
-      b.classList.add('text-[#999999]');
-      box?.classList.remove('border-2', 'border-[#101010]', 'shadow-xs');
-      box?.classList.add('border', 'border-[#e0e0e0]', 'bg-white');
-      span?.classList.remove('font-medium', 'text-[#101010]');
+      b.style.color = 'var(--muted-soft)';
+      box.style.borderWidth = '1px';
+      box.style.borderColor = 'var(--border-subtle)';
+      span?.classList.remove('font-medium');
     }
   });
 }
@@ -686,6 +722,14 @@ function updatePresetSelectionUI(size) {
 function setupEventListeners() {
   if (_eventsInitialized) return;
   _eventsInitialized = true;
+
+  // Theme Switcher buttons
+  document.querySelectorAll('.theme-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const theme = btn.dataset.theme;
+      Theme.set(theme);
+    });
+  });
 
   // Search input debounced
   DOM.searchInput?.addEventListener('input', (e) => {
@@ -737,15 +781,6 @@ function setupEventListeners() {
         actionBtn.setAttribute('aria-checked', 'true');
       }
       updateMultiselectUI();
-    } else if (action === 'copy') {
-      e.stopPropagation();
-      const icon = iconsData.find(i => i && (i.id === id || i.name === id));
-      if (!icon || !icon.svg) return;
-      navigator.clipboard.writeText(icon.svg).then(() => {
-        const originalHtml = actionBtn.innerHTML;
-        actionBtn.innerHTML = `<svg class="w-3.5 h-3.5 text-green-600 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
-        setTimeout(() => { actionBtn.innerHTML = originalHtml; }, 1500);
-      });
     }
   });
 
@@ -795,11 +830,13 @@ function setupEventListeners() {
   DOM.downloadSvgBtn?.addEventListener('click', () => {
     if (!currentIcon) return;
     const size = parseInt(DOM.exportSizeInput.value, 10) || 512;
-    const svgData = (currentIcon.svg || '')
-      .replace('<svg', `<svg width="${size}" height="${size}" style="color: #101010"`)
-      .replace(/currentColor/g, '#101010');
+    let svgData = currentIcon.svg || '';
+    if (!svgData.includes('width=') && !svgData.includes('height=')) {
+      svgData = svgData.replace('<svg', `<svg width="${size}" height="${size}"`);
+    }
 
-    const blob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+    const minified = minifySVG(svgData);
+    const blob = new Blob([minified], { type: 'image/svg+xml;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -814,10 +851,11 @@ function setupEventListeners() {
 
   DOM.copyCodeBtn?.addEventListener('click', () => {
     if (!currentIcon || !currentIcon.svg) return;
-    navigator.clipboard.writeText(currentIcon.svg).then(() => {
+    const minified = minifySVG(currentIcon.svg);
+    navigator.clipboard.writeText(minified).then(() => {
       const originalText = DOM.copyCodeBtn.innerHTML;
       DOM.copyCodeBtn.innerHTML = `
-        <svg class="w-3.5 h-3.5 text-green-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+        <svg class="w-3.5 h-3.5 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
         COPIED!
       `;
       setTimeout(() => { DOM.copyCodeBtn.innerHTML = originalText; }, 2000);
@@ -843,7 +881,7 @@ function setupEventListeners() {
     DOM.confirmDeleteBtn.disabled = true;
     DOM.confirmDeleteBtn.textContent = 'Deleting...';
     DOM.deleteStatus.classList.remove('hidden', 'text-red-600', 'text-green-600');
-    DOM.deleteStatus.classList.add('text-[#101010]');
+    DOM.deleteStatus.style.color = 'var(--fg)';
     DOM.deleteStatus.textContent = 'Deleting from GitHub...';
 
     try {
@@ -866,11 +904,11 @@ function setupEventListeners() {
       iconsData = iconsData.filter(i => i && i.id !== currentIcon.id && i.name !== currentIcon.name);
       renderIcons();
 
-      DOM.deleteStatus.classList.replace('text-[#101010]', 'text-green-600');
+      DOM.deleteStatus.classList.replace('text-red-600', 'text-green-600');
       DOM.deleteStatus.textContent = 'Success! Icon deleted.';
       setTimeout(closeModals, 1500);
     } catch (err) {
-      DOM.deleteStatus.classList.replace('text-[#101010]', 'text-red-600');
+      DOM.deleteStatus.classList.add('text-red-600');
       DOM.deleteStatus.textContent = err.message;
     } finally {
       DOM.confirmDeleteBtn.disabled = false;
@@ -889,7 +927,7 @@ function setupEventListeners() {
     DOM.saveTagsBtn.disabled = true;
     DOM.saveTagsBtn.textContent = 'SAVING...';
     DOM.editTagsStatus.classList.remove('hidden', 'text-red-600', 'text-green-600');
-    DOM.editTagsStatus.classList.add('text-[#101010]');
+    DOM.editTagsStatus.style.color = 'var(--fg)';
     DOM.editTagsStatus.textContent = 'Updating tags...';
 
     const customTags = DOM.editTagsInput.value.trim();
@@ -938,7 +976,7 @@ function setupEventListeners() {
         }
       }
 
-      DOM.editTagsStatus.classList.replace('text-[#101010]', 'text-green-600');
+      DOM.editTagsStatus.classList.add('text-green-600');
       DOM.editTagsStatus.textContent = 'Success! Tags updated.';
 
       setTimeout(() => {
@@ -946,7 +984,7 @@ function setupEventListeners() {
       }, 1000);
     } catch (err) {
       console.warn('GitHub update error:', err);
-      DOM.editTagsStatus.classList.replace('text-[#101010]', 'text-green-600');
+      DOM.editTagsStatus.classList.add('text-green-600');
       DOM.editTagsStatus.textContent = 'Saved locally.';
       setTimeout(() => {
         DOM.editTagsForm.classList.add('hidden', 'opacity-0');
@@ -973,11 +1011,11 @@ function setupEventListeners() {
 
     DOM.replaceStatus.textContent = 'REPLACING...';
     DOM.replaceStatus.classList.remove('hidden', 'text-green-600', 'text-red-600');
-    DOM.replaceStatus.classList.add('text-[#101010]');
+    DOM.replaceStatus.style.color = 'var(--fg)';
 
     try {
       const text = await file.text();
-      let finalSvg = text;
+      let finalSvg = minifySVG(text);
       const currentTags = Array.isArray(currentIcon?.tags) ? currentIcon.tags.join(', ') : '';
       if (currentTags) {
         finalSvg = finalSvg.replace(/<svg\s/, `<svg data-tags="${escapeAttribute(currentTags)}" `);
@@ -985,11 +1023,11 @@ function setupEventListeners() {
 
       // Optimistic update
       currentIcon.svg = finalSvg;
-      const sanitized = safeSanitizeSVG(finalSvg);
-      DOM.modalIconPreview.innerHTML = sanitized;
+      const imgSrc = svgToImgSrc(finalSvg);
+      DOM.modalIconPreview.innerHTML = `<img src="${imgSrc}" alt="${escapeAttribute(currentIcon.name)}" style="max-width: 100%; max-height: 100%; object-fit: contain;" />`;
 
       document.querySelectorAll('.preset-icon-container').forEach(container => {
-        container.innerHTML = sanitized;
+        container.innerHTML = `<img src="${imgSrc}" alt="${escapeAttribute(currentIcon.name)}" style="width: 100%; height: 100%; object-fit: contain;" />`;
       });
 
       const idx = iconsData.findIndex(i => i && (i.id === currentIcon.id || i.name === currentIcon.name));
@@ -1008,7 +1046,7 @@ function setupEventListeners() {
       localStorage.setItem('localEdits', JSON.stringify(localEdits));
 
       if (DOM.codeSnippet) {
-        DOM.codeSnippet.textContent = finalSvg;
+        DOM.codeSnippet.textContent = minifySVG(finalSvg);
       }
 
       renderIcons();
@@ -1025,7 +1063,7 @@ function setupEventListeners() {
         await pushToGitHub(filePath, finalSvg, `Update icon: ${currentIcon.name}`, sha);
       }
 
-      DOM.replaceStatus.classList.replace('text-[#101010]', 'text-green-600');
+      DOM.replaceStatus.classList.add('text-green-600');
       DOM.replaceStatus.textContent = 'REPLACED!';
 
       setTimeout(() => {
@@ -1033,7 +1071,7 @@ function setupEventListeners() {
         DOM.replaceIconInput.value = '';
       }, 2000);
     } catch (err) {
-      DOM.replaceStatus.classList.replace('text-[#101010]', 'text-red-600');
+      DOM.replaceStatus.classList.add('text-red-600');
       DOM.replaceStatus.textContent = err.message;
     }
   });
@@ -1100,6 +1138,7 @@ function setupEventListeners() {
 
       try {
         const text = await file.text();
+        const minifiedSvg = minifySVG(text);
         const baseName = file.name.replace('.svg', '').toLowerCase().replace(/[^a-z0-9-]/g, '-');
         let defaultName = baseName;
         let counter = 1;
@@ -1115,7 +1154,7 @@ function setupEventListeners() {
 
         selectedUploadFiles.push({
           file,
-          svgContent: text,
+          svgContent: minifiedSvg,
           name: defaultName,
           tags: ''
         });
@@ -1133,7 +1172,7 @@ function setupEventListeners() {
 
     DOM.submitUploadBtn.disabled = true;
     DOM.uploadStatus.classList.remove('hidden', 'text-red-600', 'text-green-600');
-    DOM.uploadStatus.classList.add('text-[#101010]');
+    DOM.uploadStatus.style.color = 'var(--fg)';
 
     const token = Auth.get();
     let successCount = 0;
@@ -1185,7 +1224,7 @@ function setupEventListeners() {
         });
       }
 
-      DOM.uploadStatus.classList.replace('text-[#101010]', 'text-green-600');
+      DOM.uploadStatus.classList.add('text-green-600');
       DOM.uploadStatus.textContent = `Successfully uploaded ${successCount} icon${successCount > 1 ? 's' : ''}!`;
 
       const pendingCache = JSON.parse(localStorage.getItem('pendingIcons') || '[]');
@@ -1200,7 +1239,7 @@ function setupEventListeners() {
       renderUploadItems();
       setTimeout(closeModals, 2000);
     } catch (err) {
-      DOM.uploadStatus.classList.replace('text-[#101010]', 'text-red-600');
+      DOM.uploadStatus.classList.add('text-red-600');
       DOM.uploadStatus.textContent = `Error on file ${successCount + 1}: ${err.message}`;
     } finally {
       DOM.submitUploadBtn.disabled = false;
@@ -1244,7 +1283,7 @@ function setupEventListeners() {
       DOM.saveRenameBtn.disabled = true;
       DOM.renameStatus.textContent = 'Renaming...';
       DOM.renameStatus.classList.remove('hidden', 'text-green-600', 'text-red-600');
-      DOM.renameStatus.classList.add('text-[#101010]');
+      DOM.renameStatus.style.color = 'var(--fg)';
 
       try {
         const token = Auth.get();
@@ -1281,7 +1320,7 @@ function setupEventListeners() {
         };
         localStorage.setItem('localEdits', JSON.stringify(localEdits));
 
-        DOM.renameStatus.classList.replace('text-[#101010]', 'text-green-600');
+        DOM.renameStatus.classList.add('text-green-600');
         DOM.renameStatus.textContent = 'Saved!';
 
         setTimeout(() => {
@@ -1289,7 +1328,7 @@ function setupEventListeners() {
           renderIcons();
         }, 1000);
       } catch (err) {
-        DOM.renameStatus.classList.replace('text-[#101010]', 'text-red-600');
+        DOM.renameStatus.classList.add('text-red-600');
         DOM.renameStatus.textContent = err.message;
       } finally {
         DOM.saveRenameBtn.disabled = false;
@@ -1300,6 +1339,7 @@ function setupEventListeners() {
 
 // ── Authentication Initialization ────────────────────────────────────────────
 async function checkAuth() {
+  Theme.init();
   if (Auth.isAuthenticated()) {
     DOM.loginScreen?.classList.add('hidden');
     DOM.appContent?.classList.remove('hidden');

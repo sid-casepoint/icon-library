@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -38,16 +38,6 @@
             sans: ['"JetBrains Mono"', 'monospace'],
             mono: ['"JetBrains Mono"', 'monospace'],
           },
-          colors: {
-            canvas: '#ffffff',
-            ink: '#101010',
-            charcoal: '#000000',
-            mutedHard: '#222222',
-            muted: '#555555',
-            mutedSoft: '#999999',
-            borderSoft: '#c8c8c8',
-            borderSubtle: '#e0e0e0',
-          },
           borderRadius: {
             'card': '8px',
             'badge': '6px',
@@ -63,31 +53,115 @@
   <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
   
   <style>
-    /* ── 099.SUPPLY Official Design System Tokens ── */
-    :root {
+    /* ── 099 Styleguide Theme Variables ── */
+    :root, html[data-theme="light"] {
       --bg: #ffffff;
       --fg: #101010;
+      --card-bg: #ffffff;
+      --sub-bg: #ffffff;
       --muted: #555555;
       --muted-soft: #999999;
-      --muted-hard: #222222;
       --border-subtle: #e0e0e0;
       --border-subtle-hover: #999999;
-      --border-strong: #101010;
-      --border-soft: #c8c8c8;
       --btn-primary-bg: #101010;
       --btn-primary-bg-hover: #333333;
       --btn-primary-fg: #ffffff;
       --btn-secondary-bg: #ffffff;
+      --modal-bg: #ffffff;
+      --code-bg: #ffffff;
+      --header-bg: rgba(255, 255, 255, 0.95);
+      --selection-bg: #101010;
+      --selection-fg: #ffffff;
     }
 
-    /* Cross-Browser Pure Monochrome Text Selection */
+    html[data-theme="dark"] {
+      --bg: #171713;
+      --fg: #ffffff;
+      --card-bg: #171713;
+      --sub-bg: #171713;
+      --muted: #888880;
+      --muted-soft: #666660;
+      --border-subtle: #2d2d26;
+      --border-subtle-hover: #888880;
+      --btn-primary-bg: #ffffff;
+      --btn-primary-bg-hover: #e0e0d8;
+      --btn-primary-fg: #171713;
+      --btn-secondary-bg: #171713;
+      --modal-bg: #171713;
+      --code-bg: #171713;
+      --header-bg: rgba(23, 23, 19, 0.95);
+      --selection-bg: #ffffff;
+      --selection-fg: #171713;
+    }
+
+    html[data-theme="beige"] {
+      --bg: #F5F0E7;
+      --fg: #171713;
+      --card-bg: #F5F0E7;
+      --sub-bg: #F5F0E7;
+      --muted: #6b6355;
+      --muted-soft: #9e9585;
+      --border-subtle: #ded5c5;
+      --border-subtle-hover: #9e9585;
+      --btn-primary-bg: #171713;
+      --btn-primary-bg-hover: #38352e;
+      --btn-primary-fg: #F5F0E7;
+      --btn-secondary-bg: #F5F0E7;
+      --modal-bg: #F5F0E7;
+      --code-bg: #F5F0E7;
+      --header-bg: rgba(245, 240, 231, 0.95);
+      --selection-bg: #171713;
+      --selection-fg: #F5F0E7;
+    }
+
+    html[data-theme="yellow"] {
+      --bg: #FFC83A;
+      --fg: #101010;
+      --card-bg: #FFC83A;
+      --sub-bg: #FFC83A;
+      --muted: #5c4300;
+      --muted-soft: #8a6500;
+      --border-subtle: #e0aa22;
+      --border-subtle-hover: #5c4300;
+      --btn-primary-bg: #101010;
+      --btn-primary-bg-hover: #333333;
+      --btn-primary-fg: #FFC83A;
+      --btn-secondary-bg: #FFC83A;
+      --modal-bg: #FFC83A;
+      --code-bg: #FFC83A;
+      --header-bg: rgba(255, 200, 58, 0.95);
+      --selection-bg: #101010;
+      --selection-fg: #FFC83A;
+    }
+
+    html[data-theme="blue"] {
+      --bg: #2526B3;
+      --fg: #ffffff;
+      --card-bg: #2526B3;
+      --sub-bg: #2526B3;
+      --muted: #c4c5ff;
+      --muted-soft: #8f91f7;
+      --border-subtle: #3d3ee0;
+      --border-subtle-hover: #ffffff;
+      --btn-primary-bg: #ffffff;
+      --btn-primary-bg-hover: #e0e0ff;
+      --btn-primary-fg: #2526B3;
+      --btn-secondary-bg: #2526B3;
+      --modal-bg: #2526B3;
+      --code-bg: #2526B3;
+      --header-bg: rgba(37, 38, 179, 0.95);
+      --selection-bg: #ffffff;
+      --selection-fg: #2526B3;
+    }
+
+    /* Dynamic Cross-Browser Selection */
     ::selection {
-      background-color: #101010 !important;
-      color: #ffffff !important;
+      background-color: var(--selection-bg) !important;
+      color: var(--selection-fg) !important;
     }
     ::-moz-selection {
-      background-color: #101010 !important;
-      color: #ffffff !important;
+      background-color: var(--selection-bg) !important;
+      color: var(--selection-fg) !important;
     }
 
     *, *:before, *:after {
@@ -102,11 +176,12 @@
       letter-spacing: 0.08em;
       margin: 0;
       min-height: 100vh;
+      transition: background-color 0.2s ease-out, color 0.2s ease-out;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
     }
 
-    /* 099 Primary Button */
+    /* Primary Button */
     .btn-099-primary {
       font-size: 12px;
       padding: 10px 14px 11px;
@@ -119,7 +194,7 @@
       text-transform: uppercase;
       cursor: pointer;
       line-height: 1;
-      border: 1px solid var(--fg) !important;
+      border: 1px solid var(--btn-primary-bg) !important;
       background-color: var(--btn-primary-bg) !important;
       color: var(--btn-primary-fg) !important;
       font-family: inherit;
@@ -127,14 +202,14 @@
       transition: background-color 0.12s ease-out, border-color 0.12s ease-out, transform 0.08s ease-out;
     }
     .btn-099-primary:hover {
-      background-color: #333333 !important;
-      border-color: #333333 !important;
+      background-color: var(--btn-primary-bg-hover) !important;
+      border-color: var(--btn-primary-bg-hover) !important;
     }
     .btn-099-primary:active {
       transform: scale(0.97) !important;
     }
 
-    /* 099 Secondary Button */
+    /* Secondary Button */
     .btn-099-secondary {
       font-size: 12px;
       padding: 10px 14px 11px;
@@ -156,24 +231,24 @@
     }
     .btn-099-secondary:hover {
       border-color: var(--border-subtle-hover) !important;
-      background-color: #fafafa !important;
+      background-color: var(--sub-bg) !important;
       color: var(--fg) !important;
     }
     .btn-099-secondary:active {
       transform: scale(0.97) !important;
     }
 
-    /* 099 Product / Icon Card */
+    /* Product / Icon Card */
     .icon-card-099 {
       border: 1px solid var(--border-subtle);
       border-radius: 8px;
-      background-color: var(--bg);
+      background-color: var(--card-bg);
       cursor: pointer;
       overflow: hidden;
       display: flex;
       flex-direction: column;
       text-decoration: none;
-      transition: border-color 0.12s ease-out, transform 0.08s ease-out;
+      transition: border-color 0.12s ease-out, transform 0.08s ease-out, background-color 0.2s ease-out;
     }
     .icon-card-099:hover {
       border-color: var(--border-subtle-hover) !important;
@@ -193,8 +268,8 @@
       text-transform: uppercase;
       color: var(--muted);
       border-top: 1px solid var(--border-subtle);
-      background-color: #ffffff;
-      transition: border-color 0.12s ease-out, color 0.12s ease-out;
+      background-color: var(--card-bg);
+      transition: border-color 0.12s ease-out, color 0.12s ease-out, background-color 0.2s ease-out;
     }
     .icon-card-099:hover .icon-card-footer {
       border-top-color: var(--border-subtle-hover) !important;
@@ -207,7 +282,7 @@
       height: 18px;
       border-radius: 4px;
       border: 1px solid var(--border-subtle);
-      background-color: #ffffff;
+      background-color: var(--card-bg);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -221,31 +296,31 @@
       display: none;
     }
     .multiselect-cb.is-checked {
-      background-color: #101010 !important;
-      border-color: #101010 !important;
+      background-color: var(--fg) !important;
+      border-color: var(--fg) !important;
       opacity: 1 !important;
     }
     .multiselect-cb.is-checked svg {
       display: block !important;
+      color: var(--bg) !important;
     }
 
-    /* Quick Action Copy Button */
-    .copy-svg-btn {
-      padding: 8px;
-      background-color: #ffffff;
-      border-radius: 6px;
-      color: var(--muted);
-      border: 1px solid var(--border-subtle);
-      transition: border-color 0.12s ease-out, color 0.12s ease-out, background-color 0.12s ease-out, transform 0.08s ease-out;
-      cursor: pointer;
+    /* SVG Scaling Rules for Full Rendering Integrity */
+    #modalIconPreview svg,
+    .preset-icon-container svg,
+    .icon-card-099 svg {
+      width: 100% !important;
+      height: 100% !important;
+      max-width: 100% !important;
+      max-height: 100% !important;
+      display: block;
     }
-    .copy-svg-btn:hover {
-      border-color: var(--border-subtle-hover) !important;
-      color: var(--fg) !important;
-      background-color: #fafafa !important;
-    }
-    .copy-svg-btn:active {
-      transform: scale(0.95) !important;
+
+    /* Theme Switcher Active Indicator */
+    .theme-btn.is-active {
+      outline: 2px solid var(--fg);
+      outline-offset: 2px;
+      transform: scale(1.1);
     }
 
     input[type="number"]::-webkit-inner-spin-button,
@@ -258,22 +333,22 @@
     }
   </style>
 </head>
-<body class="bg-white text-[#101010] min-h-screen flex flex-col font-mono uppercase tracking-[0.08em]">
+<body class="min-h-screen flex flex-col font-mono uppercase tracking-[0.08em]">
   
   <!-- Login Screen -->
   <div id="loginScreen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md transition-opacity duration-500">
-    <div class="w-full max-w-sm bg-white p-8 rounded-[12px] border border-[#e0e0e0] shadow-2xl">
+    <div class="w-full max-w-sm p-8 rounded-[12px] border shadow-2xl" style="background-color: var(--modal-bg); border-color: var(--border-subtle); color: var(--fg);">
       <div class="text-center mb-8">
-        <div class="mx-auto w-12 h-12 bg-[#101010] text-white rounded-[6px] flex items-center justify-center mb-6">
-          <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect></svg>
+        <div class="mx-auto w-12 h-12 rounded-[6px] flex items-center justify-center mb-6" style="background-color: var(--fg); color: var(--bg);">
+          <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect></svg>
         </div>
-        <h2 class="text-xl font-medium text-[#101010] tracking-[0.12em] mb-2">ICON LIBRARY</h2>
-        <p class="text-xs text-[#555555] tracking-[0.08em]">ENTER ACCESS KEY TO CONTINUE</p>
+        <h2 class="text-xl font-medium tracking-[0.12em] mb-2" style="color: var(--fg);">ICON LIBRARY</h2>
+        <p class="text-xs tracking-[0.08em]" style="color: var(--muted);">ENTER ACCESS KEY TO CONTINUE</p>
       </div>
       <form id="loginForm" class="space-y-4">
         <div>
           <label for="sitePassword" class="sr-only">Access Key</label>
-          <input type="password" id="sitePassword" placeholder="ACCESS KEY" required class="block w-full px-4 py-3 border border-[#e0e0e0] rounded-[6px] bg-white text-xs tracking-[0.08em] focus:border-[#101010] transition-colors text-[#101010] placeholder-[#999999] outline-none">
+          <input type="password" id="sitePassword" placeholder="ACCESS KEY" required class="block w-full px-4 py-3 border rounded-[6px] text-xs tracking-[0.08em] transition-colors outline-none" style="background-color: var(--card-bg); border-color: var(--border-subtle); color: var(--fg);">
         </div>
         <button type="submit" id="loginBtn" class="btn-099-primary w-full">
           CONTINUE
@@ -284,18 +359,27 @@
   </div>
 
   <div id="appContent" class="hidden flex-1 flex flex-col w-full">
-    <!-- Header (099 Full Bleed) -->
-    <header class="bg-white/95 backdrop-blur-xl border-b border-[#e0e0e0] sticky top-0 z-30 w-full">
+    <!-- Header (099 Full Bleed + Theme Switcher) -->
+    <header class="backdrop-blur-xl border-b sticky top-0 z-30 w-full" style="background-color: var(--header-bg); border-color: var(--border-subtle);">
       <div class="w-full px-6 sm:px-10 lg:px-12 py-4 flex items-center justify-between">
         <!-- Logo -->
         <div class="flex items-center gap-3">
-          <div class="w-7 h-7 bg-[#101010] text-white rounded-[6px] flex items-center justify-center">
-            <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect></svg>
+          <div class="w-7 h-7 rounded-[6px] flex items-center justify-center" style="background-color: var(--fg); color: var(--bg);">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect></svg>
           </div>
-          <h1 class="text-sm font-medium tracking-[0.12em] text-[#101010]">ICON LIBRARY</h1>
+          <h1 class="text-sm font-medium tracking-[0.12em]" style="color: var(--fg);">ICON LIBRARY</h1>
         </div>
 
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-4">
+          <!-- 5-Theme Switcher -->
+          <div class="flex items-center gap-2 p-1 rounded-[8px] border" style="background-color: var(--sub-bg); border-color: var(--border-subtle);" id="themeSwitcher" role="radiogroup" aria-label="Theme Switcher">
+            <button type="button" class="theme-btn w-5 h-5 rounded-full transition-all cursor-pointer" data-theme="light" title="Light (#ffffff)" style="background-color: #ffffff; box-shadow: 0 0 0 1px #e0e0e0;"></button>
+            <button type="button" class="theme-btn w-5 h-5 rounded-full transition-all cursor-pointer" data-theme="dark" title="Dark (#171713)" style="background-color: #171713; box-shadow: 0 0 0 1px #383830;"></button>
+            <button type="button" class="theme-btn w-5 h-5 rounded-full transition-all cursor-pointer" data-theme="beige" title="Beige (#F5F0E7)" style="background-color: #F5F0E7; box-shadow: 0 0 0 1px #ded5c5;"></button>
+            <button type="button" class="theme-btn w-5 h-5 rounded-full transition-all cursor-pointer" data-theme="yellow" title="Yellow (#FFC83A)" style="background-color: #FFC83A; box-shadow: 0 0 0 1px #e5b027;"></button>
+            <button type="button" class="theme-btn w-5 h-5 rounded-full transition-all cursor-pointer" data-theme="blue" title="Blue (#2526B3)" style="background-color: #2526B3; box-shadow: 0 0 0 1px #4547E8;"></button>
+          </div>
+
           <button type="button" id="openUploadModalBtn" class="btn-099-primary !py-2 !px-3.5 gap-2">
             <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
             <span class="hidden sm:inline">UPLOAD</span>
@@ -309,17 +393,17 @@
       <!-- Search Input -->
       <div class="w-full relative mb-8" role="search">
         <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-          <svg class="w-4 h-4 text-[#999999]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <svg class="w-4 h-4" style="color: var(--muted-soft);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
         </div>
-        <input type="text" id="searchInput" class="block w-full pl-11 pr-10 py-3.5 bg-white border border-[#e0e0e0] rounded-[6px] text-xs tracking-[0.08em] focus:outline-none focus:border-[#999999] transition-colors text-[#101010] placeholder-[#999999]" placeholder="SEARCH ICONS..." aria-label="Search icons">
-        <button type="button" id="clearSearchBtn" class="absolute inset-y-0 right-0 pr-4 flex items-center text-[#999999] hover:text-[#101010] hidden transition-colors cursor-pointer" aria-label="Clear search">
+        <input type="text" id="searchInput" class="block w-full pl-11 pr-10 py-3.5 border rounded-[6px] text-xs tracking-[0.08em] focus:outline-none transition-colors" style="background-color: var(--card-bg); border-color: var(--border-subtle); color: var(--fg);" placeholder="SEARCH ICONS..." aria-label="Search icons">
+        <button type="button" id="clearSearchBtn" class="absolute inset-y-0 right-0 pr-4 flex items-center hidden transition-colors cursor-pointer" style="color: var(--muted-soft);" aria-label="Clear search">
           <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
       </div>
 
       <!-- Controls Bar -->
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-4 border-b border-[#e0e0e0]">
-        <div class="text-[12px] text-[#555555] tracking-[0.08em] uppercase font-medium whitespace-nowrap shrink-0">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-4 border-b" style="border-color: var(--border-subtle);">
+        <div class="text-[12px] tracking-[0.08em] uppercase font-medium whitespace-nowrap shrink-0" style="color: var(--muted);">
            <span id="iconCount">0</span> ICONS
         </div>
         
@@ -327,27 +411,27 @@
           <!-- Sort Dropdown -->
           <div class="w-full sm:w-60 relative">
             <label for="sortSelect" class="sr-only">Sort Order</label>
-            <select id="sortSelect" class="block w-full h-full pl-3.5 pr-9 py-2.5 appearance-none truncate bg-white border border-[#e0e0e0] rounded-[6px] text-[12px] tracking-[0.08em] focus:outline-none focus:border-[#999999] transition-colors text-[#101010] cursor-pointer outline-none font-mono">
+            <select id="sortSelect" class="block w-full h-full pl-3.5 pr-9 py-2.5 appearance-none truncate border rounded-[6px] text-[12px] tracking-[0.08em] focus:outline-none transition-colors cursor-pointer outline-none font-mono" style="background-color: var(--card-bg); border-color: var(--border-subtle); color: var(--fg);">
               <option value="newest">SORT: NEWEST</option>
               <option value="oldest">SORT: OLDEST</option>
               <option value="az">SORT: A TO Z</option>
               <option value="za">SORT: Z TO A</option>
             </select>
             <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-              <svg class="w-3.5 h-3.5 text-[#555555]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg>
+              <svg class="w-3.5 h-3.5" style="color: var(--muted);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg>
             </div>
           </div>
 
           <!-- Grid Size Dropdown -->
           <div class="w-full sm:w-60 relative">
             <label for="gridSizeSelect" class="sr-only">Grid Size</label>
-            <select id="gridSizeSelect" class="block w-full h-full pl-3.5 pr-9 py-2.5 appearance-none truncate bg-white border border-[#e0e0e0] rounded-[6px] text-[12px] tracking-[0.08em] focus:outline-none focus:border-[#999999] transition-colors text-[#101010] cursor-pointer outline-none font-mono">
+            <select id="gridSizeSelect" class="block w-full h-full pl-3.5 pr-9 py-2.5 appearance-none truncate border rounded-[6px] text-[12px] tracking-[0.08em] focus:outline-none transition-colors cursor-pointer outline-none font-mono" style="background-color: var(--card-bg); border-color: var(--border-subtle); color: var(--fg);">
               <option value="50">GRID: SMALL (50PX)</option>
               <option value="75" selected>GRID: MEDIUM (75PX)</option>
               <option value="100">GRID: LARGE (100PX)</option>
             </select>
             <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-              <svg class="w-3.5 h-3.5 text-[#555555]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg>
+              <svg class="w-3.5 h-3.5" style="color: var(--muted);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg>
             </div>
           </div>
         </div>
@@ -356,7 +440,7 @@
       <!-- Fluid Grid -->
       <div id="iconGrid" class="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-6 w-full"></div>
       <div id="noResults" class="hidden text-center py-20">
-        <p class="text-[#999999] font-normal text-sm tracking-[0.08em]">NO ICONS FOUND</p>
+        <p class="font-normal text-sm tracking-[0.08em]" style="color: var(--muted-soft);">NO ICONS FOUND</p>
       </div>
     </main>
   </div>
@@ -365,29 +449,29 @@
   <div id="iconModal" class="fixed inset-0 z-40 hidden transition-opacity duration-300" role="dialog" aria-modal="true" aria-labelledby="modalIconTitle">
     <div class="fixed inset-0 bg-black/60 backdrop-blur-md backdrop-modal"></div>
     <div class="fixed inset-0 z-10 flex items-center justify-center p-4">
-      <div id="iconDrawer" class="relative w-full max-w-[760px] max-h-[90vh] overflow-y-auto bg-white border border-[#e0e0e0] rounded-[12px] shadow-2xl p-6 transform scale-95 opacity-0 transition-all duration-300">
+      <div id="iconDrawer" class="relative w-full max-w-[760px] max-h-[90vh] overflow-y-auto border rounded-[12px] shadow-2xl p-6 transform scale-95 opacity-0 transition-all duration-300" style="background-color: var(--modal-bg); border-color: var(--border-subtle); color: var(--fg);">
         
         <!-- Modal Header -->
-        <div class="flex items-center justify-between mb-6 pb-3.5 border-b border-[#e0e0e0]">
+        <div class="flex items-center justify-between mb-6 pb-3.5 border-b" style="border-color: var(--border-subtle);">
           <div class="flex items-center gap-2 flex-1">
-            <h3 class="text-xs font-normal tracking-[0.12em] text-[#101010]" id="modalIconTitle">ICON-NAME</h3>
-            <input type="text" id="renameIconInput" class="hidden text-xs text-[#101010] tracking-[0.08em] bg-white border border-[#e0e0e0] px-2 py-1 rounded-[4px] outline-none focus:border-[#999999] flex-1 max-w-[200px]" aria-label="New icon name" />
+            <h3 class="text-xs font-normal tracking-[0.12em]" style="color: var(--fg);" id="modalIconTitle">ICON-NAME</h3>
+            <input type="text" id="renameIconInput" class="hidden text-xs tracking-[0.08em] border px-2 py-1 rounded-[4px] outline-none flex-1 max-w-[200px]" style="background-color: var(--card-bg); border-color: var(--border-subtle); color: var(--fg);" aria-label="New icon name" />
             
-            <button type="button" id="renameIconBtn" class="text-[#999999] hover:text-[#101010] transition-colors p-1 ml-1 cursor-pointer" title="Rename Icon" aria-label="Rename icon">
+            <button type="button" id="renameIconBtn" class="transition-colors p-1 ml-1 cursor-pointer" style="color: var(--muted-soft);" title="Rename Icon" aria-label="Rename icon">
               <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
             </button>
             
-            <button type="button" id="saveRenameBtn" class="hidden text-[10px] tracking-[0.08em] bg-[#101010] text-white px-2.5 py-1 rounded-[4px] hover:bg-black transition-colors cursor-pointer">SAVE</button>
-            <button type="button" id="cancelRenameBtn" class="hidden text-[10px] tracking-[0.08em] text-[#555555] hover:text-[#101010] px-2 py-1 transition-colors cursor-pointer">CANCEL</button>
+            <button type="button" id="saveRenameBtn" class="hidden text-[10px] tracking-[0.08em] px-2.5 py-1 rounded-[4px] transition-colors cursor-pointer" style="background-color: var(--fg); color: var(--bg);">SAVE</button>
+            <button type="button" id="cancelRenameBtn" class="hidden text-[10px] tracking-[0.08em] px-2 py-1 transition-colors cursor-pointer" style="color: var(--muted);">CANCEL</button>
             
-            <span id="renameStatus" role="status" aria-live="polite" class="hidden text-[10px] tracking-[0.08em] text-[#101010] ml-2">RENAMING...</span>
+            <span id="renameStatus" role="status" aria-live="polite" class="hidden text-[10px] tracking-[0.08em] ml-2" style="color: var(--fg);">RENAMING...</span>
           </div>
 
           <div class="flex items-center gap-1.5">
-            <button type="button" id="deleteIconBtn" class="text-[#999999] hover:text-red-600 transition-colors p-1.5 cursor-pointer" title="Delete Icon" aria-label="Delete icon">
+            <button type="button" id="deleteIconBtn" class="text-red-500 hover:text-red-600 transition-colors p-1.5 cursor-pointer" title="Delete Icon" aria-label="Delete icon">
               <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
             </button>
-            <button type="button" class="closeModalBtn text-[#999999] hover:text-[#101010] transition-colors p-1.5 cursor-pointer" aria-label="Close icon detail">
+            <button type="button" class="closeModalBtn transition-colors p-1.5 cursor-pointer" style="color: var(--muted-soft);" aria-label="Close icon detail">
               <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
           </div>
@@ -396,30 +480,30 @@
         <div class="flex flex-col md:flex-row gap-6">
           <!-- Left Column: Big Preview & Tags -->
           <div class="flex-1 flex flex-col min-w-0">
-            <div class="w-full flex-1 min-h-[220px] flex flex-col items-center justify-center p-6 text-[#101010] border border-[#e0e0e0] rounded-[8px] bg-white mb-4 relative">
-              <div id="modalIconPreview" class="w-20 h-20 mb-3 flex items-center justify-center text-[#101010]"></div>
+            <div class="w-full flex-1 min-h-[220px] flex flex-col items-center justify-center p-6 border rounded-[8px] mb-4 relative" style="background-color: var(--card-bg); border-color: var(--border-subtle);">
+              <div id="modalIconPreview" class="w-24 h-24 mb-3 flex items-center justify-center"></div>
               <input type="file" id="replaceIconInput" accept=".svg" class="hidden">
               <button type="button" id="replaceSvgBtn" class="btn-099-secondary !text-[10px] !py-1.5 !px-3 z-10">REPLACE SVG</button>
-              <span id="replaceStatus" role="status" aria-live="polite" class="mt-2 text-[10px] text-[#101010] tracking-[0.08em] hidden"></span>
+              <span id="replaceStatus" role="status" aria-live="polite" class="mt-2 text-[10px] tracking-[0.08em] hidden" style="color: var(--fg);"></span>
             </div>
             
             <div class="w-full text-left">
               <div class="flex items-center justify-between mb-2">
                 <div id="modalIconTags" class="flex flex-wrap gap-1.5"></div>
                 <div class="relative group flex items-center justify-center">
-                  <button type="button" id="editTagsBtn" class="p-1 text-[#999999] hover:text-[#101010] transition-colors cursor-pointer" aria-label="Edit tags">
+                  <button type="button" id="editTagsBtn" class="p-1 transition-colors cursor-pointer" style="color: var(--muted-soft);" aria-label="Edit tags">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
                     </svg>
                   </button>
-                  <div class="absolute bottom-full mb-2 right-0 px-2 py-1 bg-[#101010] text-white text-[10px] tracking-[0.08em] rounded-[4px] invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none whitespace-nowrap z-50">EDIT TAGS</div>
+                  <div class="absolute bottom-full mb-2 right-0 px-2 py-1 text-[10px] tracking-[0.08em] rounded-[4px] invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none whitespace-nowrap z-50" style="background-color: var(--fg); color: var(--bg);">EDIT TAGS</div>
                 </div>
               </div>
               
-              <div id="editTagsForm" class="hidden opacity-0 transition-opacity duration-200 bg-white p-3 rounded-[6px] border border-[#e0e0e0] mb-2">
-                <label for="editTagsInput" class="block text-[10px] tracking-[0.08em] mb-1.5 text-[#555555]">TAGS (COMMA SEPARATED)</label>
+              <div id="editTagsForm" class="hidden opacity-0 transition-opacity duration-200 p-3 rounded-[6px] border mb-2" style="background-color: var(--card-bg); border-color: var(--border-subtle);">
+                <label for="editTagsInput" class="block text-[10px] tracking-[0.08em] mb-1.5" style="color: var(--muted);">TAGS (COMMA SEPARATED)</label>
                 <div class="flex gap-2">
-                  <input type="text" id="editTagsInput" class="flex-1 bg-white border border-[#e0e0e0] rounded-[6px] px-2.5 py-1.5 text-xs text-[#101010] focus:border-[#999999] outline-none">
+                  <input type="text" id="editTagsInput" class="flex-1 border rounded-[6px] px-2.5 py-1.5 text-xs outline-none" style="background-color: var(--card-bg); border-color: var(--border-subtle); color: var(--fg);">
                   <button type="button" id="saveTagsBtn" class="btn-099-primary !py-1.5 !px-3 !text-[10px]">SAVE</button>
                 </div>
                 <p id="editTagsStatus" role="status" aria-live="polite" class="mt-2 text-xs hidden text-center"></p>
@@ -430,33 +514,33 @@
           <!-- Right Column: Export Tools -->
           <div class="flex-1 flex flex-col gap-3.5 min-w-0">
             <!-- Preset Sizes -->
-            <div class="flex items-end justify-center gap-3 pb-3 border-b border-[#e0e0e0]">
-              <button type="button" class="preset-size-btn group flex flex-col items-center gap-1.5 text-[#999999] hover:text-[#101010] transition-colors cursor-pointer" data-size="50">
-                <div class="preset-box border border-[#e0e0e0] rounded-[6px] flex items-center justify-center bg-white group-hover:border-[#999999] transition-colors overflow-hidden" style="width: 46px; height: 46px;">
-                  <div class="preset-icon-container w-full h-full p-2 text-[#101010] flex items-center justify-center"></div>
+            <div class="flex items-end justify-center gap-3 pb-3 border-b" style="border-color: var(--border-subtle);">
+              <button type="button" class="preset-size-btn group flex flex-col items-center gap-1.5 transition-colors cursor-pointer" style="color: var(--muted-soft);" data-size="50">
+                <div class="preset-box border rounded-[6px] flex items-center justify-center transition-colors overflow-hidden" style="width: 46px; height: 46px; background-color: var(--card-bg); border-color: var(--border-subtle);">
+                  <div class="preset-icon-container w-full h-full p-2 flex items-center justify-center"></div>
                 </div>
                 <span class="text-[10px] tracking-[0.08em]">50PX</span>
               </button>
-              <button type="button" class="preset-size-btn group flex flex-col items-center gap-1.5 text-[#999999] hover:text-[#101010] transition-colors cursor-pointer" data-size="75">
-                <div class="preset-box border border-[#e0e0e0] rounded-[6px] flex items-center justify-center bg-white group-hover:border-[#999999] transition-colors overflow-hidden" style="width: 68px; height: 68px;">
-                  <div class="preset-icon-container w-full h-full p-2.5 text-[#101010] flex items-center justify-center"></div>
+              <button type="button" class="preset-size-btn group flex flex-col items-center gap-1.5 transition-colors cursor-pointer" style="color: var(--muted-soft);" data-size="75">
+                <div class="preset-box border rounded-[6px] flex items-center justify-center transition-colors overflow-hidden" style="width: 68px; height: 68px; background-color: var(--card-bg); border-color: var(--border-subtle);">
+                  <div class="preset-icon-container w-full h-full p-2.5 flex items-center justify-center"></div>
                 </div>
                 <span class="text-[10px] tracking-[0.08em]">75PX</span>
               </button>
-              <button type="button" class="preset-size-btn group flex flex-col items-center gap-1.5 text-[#101010] transition-colors cursor-pointer" data-size="100">
-                <div class="preset-box border border-[#101010] rounded-[6px] flex items-center justify-center bg-white overflow-hidden shadow-xs" style="width: 88px; height: 88px;">
-                  <div class="preset-icon-container w-full h-full p-3 text-[#101010] flex items-center justify-center"></div>
+              <button type="button" class="preset-size-btn group flex flex-col items-center gap-1.5 transition-colors cursor-pointer" style="color: var(--fg);" data-size="100">
+                <div class="preset-box border-2 rounded-[6px] flex items-center justify-center overflow-hidden shadow-xs" style="width: 88px; height: 88px; background-color: var(--card-bg); border-color: var(--fg);">
+                  <div class="preset-icon-container w-full h-full p-3 flex items-center justify-center"></div>
                 </div>
-                <span class="text-[10px] tracking-[0.08em] font-medium text-[#101010]">100PX</span>
+                <span class="text-[10px] tracking-[0.08em] font-medium" style="color: var(--fg);">100PX</span>
               </button>
             </div>
 
             <!-- Custom Size Input -->
-            <div class="flex items-center justify-between border border-[#e0e0e0] rounded-[6px] px-3 py-2 bg-white focus-within:border-[#999999] transition-colors">
-              <label for="exportSizeInput" class="text-[11px] tracking-[0.08em] text-[#555555] whitespace-nowrap">EXPORT SIZE</label>
+            <div class="flex items-center justify-between border rounded-[6px] px-3 py-2 transition-colors" style="background-color: var(--card-bg); border-color: var(--border-subtle);">
+              <label for="exportSizeInput" class="text-[11px] tracking-[0.08em] whitespace-nowrap" style="color: var(--muted);">EXPORT SIZE</label>
               <div class="flex items-center gap-1">
-                <input type="number" id="exportSizeInput" value="100" min="16" max="4096" class="bg-transparent border-none text-xs font-medium text-[#101010] outline-none w-14 text-right p-0">
-                <span class="text-[11px] text-[#555555]">PX</span>
+                <input type="number" id="exportSizeInput" value="100" min="16" max="4096" class="bg-transparent border-none text-xs font-medium outline-none w-14 text-right p-0" style="color: var(--fg);">
+                <span class="text-[11px]" style="color: var(--muted);">PX</span>
               </div>
             </div>
             
@@ -478,7 +562,7 @@
             
             <!-- Code Snippet -->
             <div class="mt-auto">
-              <pre class="bg-white p-3 rounded-[6px] border border-[#e0e0e0] text-[11px] overflow-x-auto text-[#101010] max-w-full font-mono"><code id="codeSnippet"></code></pre>
+              <pre class="p-3 rounded-[6px] border text-[11px] overflow-x-auto max-w-full font-mono" style="background-color: var(--code-bg); border-color: var(--border-subtle); color: var(--fg);"><code id="codeSnippet"></code></pre>
               <div class="mt-2">
                 <button type="button" id="copyCodeBtn" class="btn-099-secondary w-full !py-2.5 gap-2">
                   <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
@@ -496,23 +580,23 @@
   <div id="uploadModal" class="fixed inset-0 z-50 hidden transition-opacity duration-500" role="dialog" aria-modal="true" aria-labelledby="uploadModalTitle">
     <div class="fixed inset-0 bg-black/60 backdrop-blur-md backdrop-modal"></div>
     <div class="fixed inset-0 z-10 overflow-y-auto flex items-center justify-center p-4">
-      <div class="relative w-full max-w-2xl rounded-[12px] bg-white p-8 border border-[#e0e0e0] shadow-2xl">
-        <button type="button" class="closeUploadModalBtn absolute top-6 right-6 text-[#999999] hover:text-[#101010] p-1 transition-colors cursor-pointer" aria-label="Close upload modal">
+      <div class="relative w-full max-w-2xl rounded-[12px] p-8 border shadow-2xl" style="background-color: var(--modal-bg); border-color: var(--border-subtle); color: var(--fg);">
+        <button type="button" class="closeUploadModalBtn absolute top-6 right-6 p-1 transition-colors cursor-pointer" style="color: var(--muted-soft);" aria-label="Close upload modal">
           <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
         </button>
-        <h3 id="uploadModalTitle" class="text-sm font-normal tracking-[0.12em] mb-6 text-[#101010]">UPLOAD ICONS</h3>
+        <h3 id="uploadModalTitle" class="text-sm font-normal tracking-[0.12em] mb-6" style="color: var(--fg);">UPLOAD ICONS</h3>
         
         <form id="uploadForm" class="flex flex-col gap-4">
           <!-- File Picker -->
           <div>
-            <label for="uploadFile" class="block text-[11px] tracking-[0.08em] mb-2 text-[#555555]">SELECT SVG FILE(S)</label>
-            <input type="file" id="uploadFile" accept=".svg" multiple class="block w-full text-xs text-[#555555] file:mr-3 file:py-2 file:px-3 file:rounded-[4px] file:border-0 file:text-xs file:font-medium file:bg-[#101010] file:text-white hover:file:bg-black transition-colors cursor-pointer border border-[#e0e0e0] rounded-[6px] p-1 bg-white">
+            <label for="uploadFile" class="block text-[11px] tracking-[0.08em] mb-2" style="color: var(--muted);">SELECT SVG FILE(S)</label>
+            <input type="file" id="uploadFile" accept=".svg" multiple class="block w-full text-xs file:mr-3 file:py-2 file:px-3 file:rounded-[4px] file:border-0 file:text-xs file:font-medium transition-colors cursor-pointer border rounded-[6px] p-1" style="background-color: var(--card-bg); border-color: var(--border-subtle); color: var(--fg); file:background-color: var(--fg); file:color: var(--bg);">
           </div>
           
           <!-- Dynamic Upload List Container -->
           <div id="uploadItemsContainer" class="flex flex-col gap-2.5 max-h-[50vh] overflow-y-auto pr-1"></div>
 
-          <div id="uploadFooter" class="hidden pt-4 border-t border-[#e0e0e0]">
+          <div id="uploadFooter" class="hidden pt-4 border-t" style="border-color: var(--border-subtle);">
             <button type="button" id="submitUploadBtn" class="btn-099-primary w-full gap-2 !py-3">
               <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
               UPLOAD
@@ -528,11 +612,11 @@
   <div id="deleteModal" class="fixed inset-0 z-50 hidden transition-opacity duration-500" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle">
     <div class="fixed inset-0 bg-black/60 backdrop-blur-md backdrop-modal"></div>
     <div class="fixed inset-0 z-10 flex items-center justify-center p-4">
-      <div class="relative w-full max-w-xs rounded-[12px] bg-white p-6 border border-[#e0e0e0] text-center shadow-2xl">
-        <h3 id="deleteModalTitle" class="text-sm font-normal tracking-[0.12em] mb-2 text-[#101010]">DELETE ICON</h3>
-        <p class="text-xs text-[#555555] tracking-[0.08em] mb-6">ARE YOU SURE YOU WANT TO PERMANENTLY DELETE THIS ICON?</p>
+      <div class="relative w-full max-w-xs rounded-[12px] p-6 border text-center shadow-2xl" style="background-color: var(--modal-bg); border-color: var(--border-subtle); color: var(--fg);">
+        <h3 id="deleteModalTitle" class="text-sm font-normal tracking-[0.12em] mb-2" style="color: var(--fg);">DELETE ICON</h3>
+        <p class="text-xs tracking-[0.08em] mb-6" style="color: var(--muted);">ARE YOU SURE YOU WANT TO PERMANENTLY DELETE THIS ICON?</p>
         <div class="flex flex-col gap-2">
-          <button type="button" id="confirmDeleteBtn" class="btn-099-primary !bg-red-600 !border-red-600 hover:!bg-red-700 w-full">DELETE ICON</button>
+          <button type="button" id="confirmDeleteBtn" class="btn-099-primary !bg-red-600 !border-red-600 hover:!bg-red-700 w-full !text-white">DELETE ICON</button>
           <button type="button" class="closeDeleteModalBtn btn-099-secondary w-full">CANCEL</button>
         </div>
         <p id="deleteStatus" role="status" aria-live="polite" class="mt-2 text-xs hidden"></p>
@@ -541,11 +625,11 @@
   </div>
 
   <!-- Floating Multiselect Action Bar -->
-  <div id="multiselectBar" class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-white border border-[#e0e0e0] shadow-2xl rounded-[8px] px-6 py-3.5 flex items-center gap-6 z-40 transition-transform duration-300 translate-y-32">
-    <span class="text-xs text-[#555555] font-medium tracking-[0.08em]" id="multiselectCount">0 SELECTED</span>
-    <button type="button" id="multiselectDeleteBtn" class="btn-099-primary !bg-red-600 !border-red-600 hover:!bg-red-700 !py-1.5 !px-3 !text-[11px]">DELETE</button>
+  <div id="multiselectBar" class="fixed bottom-8 left-1/2 -translate-x-1/2 border shadow-2xl rounded-[8px] px-6 py-3.5 flex items-center gap-6 z-40 transition-transform duration-300 translate-y-32" style="background-color: var(--modal-bg); border-color: var(--border-subtle);">
+    <span class="text-xs font-medium tracking-[0.08em]" style="color: var(--muted);" id="multiselectCount">0 SELECTED</span>
+    <button type="button" id="multiselectDeleteBtn" class="btn-099-primary !bg-red-600 !border-red-600 hover:!bg-red-700 !py-1.5 !px-3 !text-[11px] !text-white">DELETE</button>
   </div>
 
-  <script src="app.js"></script>
+  <script src="app.js?v=3.0.0"></script>
 </body>
 </html>
