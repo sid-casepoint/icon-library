@@ -12,6 +12,18 @@ let _lastFocusedElement = null;
 let _searchDebounceTimer = null;
 let _eventsInitialized = false;
 
+// Helper to safely write HTML and avoid DOM XSS (CodeQL Alert 1)
+function setSafeHTML(element, html) {
+  if (!element) return;
+  if (window.DOMPurify) {
+    element.innerHTML = window.DOMPurify.sanitize(html, {
+      USE_PROFILES: { html: true, svg: true }
+    });
+  } else {
+    element.innerHTML = html;
+  }
+}
+
 // ── Theme Engine ──────────────────────────────────────────────────────────────
 const Theme = {
   current: 'light',
@@ -334,7 +346,7 @@ function renderIcons() {
   });
 
   if (filtered.length === 0) {
-    DOM.iconGrid.innerHTML = '';
+    setSafeHTML(DOM.iconGrid, '');
     DOM.noResults.classList.remove('hidden');
     return;
   }
@@ -348,7 +360,7 @@ function renderIcons() {
     'grid-cols-[repeat(auto-fill,minmax(190px,1fr))]'
   );
 
-  DOM.iconGrid.innerHTML = filtered.map(icon => {
+  setSafeHTML(DOM.iconGrid, filtered.map(icon => {
     if (!icon) return '';
     const iconId = icon.id || icon.name || 'icon';
     const iconName = icon.name || iconId;
@@ -381,7 +393,7 @@ function renderIcons() {
         </button>
       </div>
     `;
-  }).join('');
+  }).join(''));
 }
 
 function updateMultiselectUI() {
@@ -403,19 +415,19 @@ function renderModalTags() {
   const tags = Array.isArray(currentIcon.tags) ? currentIcon.tags : [];
   
   if (tags.length === 0) {
-    DOM.modalIconTags.innerHTML = `
+    setSafeHTML(DOM.modalIconTags, `
       <button type="button" id="addTagsPlaceholderBtn" class="btn-099-secondary !py-1.5 !px-2.5 !text-[11px] !rounded-[6px] flex items-center gap-1">
-        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
         ADD TAGS
       </button>
-    `;
+    `);
     if (DOM.editTagsBtn) {
       DOM.editTagsBtn.parentElement.classList.add('hidden');
     }
   } else {
-    DOM.modalIconTags.innerHTML = tags.map(tag => `
+    setSafeHTML(DOM.modalIconTags, tags.map(tag => `
       <button type="button" class="tag-btn btn-099-secondary !py-1.5 !px-2.5 !text-[11px] !rounded-[6px]" data-tag="${escapeAttribute(tag)}">${escapeAttribute(tag)}</button>
-    `).join('');
+    `).join(''));
     if (DOM.editTagsBtn) {
       DOM.editTagsBtn.parentElement.classList.remove('hidden');
     }
@@ -435,10 +447,10 @@ function openModal(id) {
   if (DOM.replaceStatus) DOM.replaceStatus.classList.add('hidden');
 
   const imgSrc = svgToImgSrc(currentIcon.svg || '');
-  DOM.modalIconPreview.innerHTML = `<img src="${imgSrc}" alt="${escapeAttribute(currentIcon.name)}" style="max-width: 100%; max-height: 100%; object-fit: contain;" />`;
+  setSafeHTML(DOM.modalIconPreview, `<img src="${imgSrc}" alt="${escapeAttribute(currentIcon.name)}" style="max-width: 100%; max-height: 100%; object-fit: contain;" />`);
 
   document.querySelectorAll('.preset-icon-container').forEach(container => {
-    container.innerHTML = `<img src="${imgSrc}" alt="${escapeAttribute(currentIcon.name)}" style="width: 100%; height: 100%; object-fit: contain;" />`;
+    setSafeHTML(container, `<img src="${imgSrc}" alt="${escapeAttribute(currentIcon.name)}" style="width: 100%; height: 100%; object-fit: contain;" />`);
   });
 
   updateCodeSnippet();
@@ -666,11 +678,11 @@ function copyImageToClipboard(format) {
         const btn = format === 'jpeg' ? DOM.copyJpgBtn : DOM.copyPngBtn;
         if (btn) {
           const originalText = btn.innerHTML;
-          btn.innerHTML = `
+          setSafeHTML(btn, `
             <svg class="w-3.5 h-3.5 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
             COPIED!
-          `;
-          setTimeout(() => { btn.innerHTML = originalText; }, 2000);
+          `);
+          setTimeout(() => { setSafeHTML(btn, originalText); }, 2000);
         }
       } catch (err) {
         console.error('Clipboard write failed:', err);
@@ -699,7 +711,7 @@ function updateSearch(query, isProgrammatic = false) {
 let selectedUploadFiles = [];
 
 function renderUploadItems() {
-  DOM.uploadItemsContainer.innerHTML = '';
+  setSafeHTML(DOM.uploadItemsContainer, '');
 
   if (selectedUploadFiles.length === 0) {
     DOM.uploadFooter.classList.add('hidden');
@@ -707,10 +719,10 @@ function renderUploadItems() {
   }
 
   DOM.uploadFooter.classList.remove('hidden');
-  DOM.submitUploadBtn.innerHTML = `
+  setSafeHTML(DOM.submitUploadBtn, `
     <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
     Upload ${selectedUploadFiles.length} Icon${selectedUploadFiles.length > 1 ? 's' : ''}
-  `;
+  `);
 
   selectedUploadFiles.forEach((item, index) => {
     const row = document.createElement('div');
@@ -722,7 +734,7 @@ function renderUploadItems() {
     previewBox.className = 'w-12 h-12 shrink-0 p-2 flex items-center justify-center border rounded-[6px] overflow-hidden';
     previewBox.style.backgroundColor = 'var(--card-bg)';
     previewBox.style.borderColor = 'var(--border-subtle)';
-    previewBox.innerHTML = `<img src="${svgToImgSrc(item.svgContent)}" alt="preview" style="width: 100%; height: 100%; object-fit: contain;" />`;
+    setSafeHTML(previewBox, `<img src="${svgToImgSrc(item.svgContent)}" alt="preview" style="width: 100%; height: 100%; object-fit: contain;" />`);
 
     const inputsCol = document.createElement('div');
     inputsCol.className = 'flex-1 flex gap-3';
@@ -768,7 +780,7 @@ function renderUploadItems() {
     const removeBtn = document.createElement('button');
     removeBtn.type = 'button';
     removeBtn.className = 'shrink-0 p-2 text-red-500 hover:text-red-600 transition-colors cursor-pointer';
-    removeBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>`;
+    setSafeHTML(removeBtn, `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>`);
     removeBtn.addEventListener('click', () => {
       selectedUploadFiles.splice(index, 1);
       renderUploadItems();
@@ -962,11 +974,11 @@ function setupEventListeners() {
     const minified = minifySVG(currentIcon.svg);
     navigator.clipboard.writeText(minified).then(() => {
       const originalText = DOM.copyCodeBtn.innerHTML;
-      DOM.copyCodeBtn.innerHTML = `
+      setSafeHTML(DOM.copyCodeBtn, `
         <svg class="w-3.5 h-3.5 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
         COPIED!
-      `;
-      setTimeout(() => { DOM.copyCodeBtn.innerHTML = originalText; }, 2000);
+      `);
+      setTimeout(() => { setSafeHTML(DOM.copyCodeBtn, originalText); }, 2000);
     });
   });
 
@@ -1135,10 +1147,10 @@ function setupEventListeners() {
       // Optimistic update
       currentIcon.svg = finalSvg;
       const imgSrc = svgToImgSrc(finalSvg);
-      DOM.modalIconPreview.innerHTML = `<img src="${imgSrc}" alt="${escapeAttribute(currentIcon.name)}" style="max-width: 100%; max-height: 100%; object-fit: contain;" />`;
+      setSafeHTML(DOM.modalIconPreview, `<img src="${imgSrc}" alt="${escapeAttribute(currentIcon.name)}" style="max-width: 100%; max-height: 100%; object-fit: contain;" />`);
 
       document.querySelectorAll('.preset-icon-container').forEach(container => {
-        container.innerHTML = `<img src="${imgSrc}" alt="${escapeAttribute(currentIcon.name)}" style="width: 100%; height: 100%; object-fit: contain;" />`;
+        setSafeHTML(container, `<img src="${imgSrc}" alt="${escapeAttribute(currentIcon.name)}" style="width: 100%; height: 100%; object-fit: contain;" />`);
       });
 
       const idx = iconsData.findIndex(i => i && (i.id === currentIcon.id || i.name === currentIcon.name));
