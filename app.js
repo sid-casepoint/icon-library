@@ -128,6 +128,8 @@ const DOM = {
   downloadJpgBtn: document.getElementById('downloadJpgBtn'),
   codeSnippet: document.getElementById('codeSnippet'),
   copyCodeBtn: document.getElementById('copyCodeBtn'),
+  copyPngBtn: document.getElementById('copyPngBtn'),
+  copyJpgBtn: document.getElementById('copyJpgBtn'),
   // Upload Modal
   uploadModal: document.getElementById('uploadModal'),
   openUploadModalBtn: document.getElementById('openUploadModalBtn'),
@@ -620,6 +622,60 @@ function downloadImage(format) {
   img.src = url;
 }
 
+function copyImageToClipboard(format) {
+  if (!currentIcon) return;
+  const size = parseInt(DOM.exportSizeInput.value, 10) || 512;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+
+  if (format === 'jpeg') {
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, size, size);
+  }
+
+  let svgData = currentIcon.svg || '';
+  if (!svgData.includes('width=') && !svgData.includes('height=')) {
+    svgData = svgData.replace('<svg', `<svg width="${size}" height="${size}"`);
+  }
+
+  const blob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const img = new Image();
+
+  img.onload = () => {
+    ctx.drawImage(img, 0, 0, size, size);
+    URL.revokeObjectURL(url);
+
+    const mimeType = format === 'jpeg' ? 'image/jpeg' : 'image/png';
+    canvas.toBlob(async (imageBlob) => {
+      if (!imageBlob) {
+        console.error('Blob generation failed');
+        return;
+      }
+      try {
+        const item = new ClipboardItem({ [imageBlob.type]: imageBlob });
+        await navigator.clipboard.write([item]);
+        
+        const btn = format === 'jpeg' ? DOM.copyJpgBtn : DOM.copyPngBtn;
+        if (btn) {
+          const originalText = btn.innerHTML;
+          btn.innerHTML = `
+            <svg class="w-3.5 h-3.5 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+            COPIED!
+          `;
+          setTimeout(() => { btn.innerHTML = originalText; }, 2000);
+        }
+      } catch (err) {
+        console.error('Clipboard write failed:', err);
+      }
+    }, mimeType);
+  };
+  img.src = url;
+}
+
 function updateSearch(query, isProgrammatic = false) {
   searchQuery = query;
   if ((isProgrammatic || document.activeElement !== DOM.searchInput) && DOM.searchInput && DOM.searchInput.value !== query) {
@@ -909,6 +965,9 @@ function setupEventListeners() {
       setTimeout(() => { DOM.copyCodeBtn.innerHTML = originalText; }, 2000);
     });
   });
+
+  DOM.copyPngBtn?.addEventListener('click', () => copyImageToClipboard('png'));
+  DOM.copyJpgBtn?.addEventListener('click', () => copyImageToClipboard('jpeg'));
 
   // Upload modal trigger
   DOM.openUploadModalBtn?.addEventListener('click', () => {
