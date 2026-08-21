@@ -18,5 +18,15 @@
     "concurrently": "^10.0.5",
     "live-server": "^1.2.2",
     "nodemon": "^3.1.14"
+  },
+  "overrides": {
+    "braces": "^3.0.3",
+    "uuid": "^11.1.1",
+    "micromatch": "^4.0.8"
+  },
+  "resolutions": {
+    "braces": "^3.0.3",
+    "uuid": "^11.1.1",
+    "micromatch": "^4.0.8"
   }
 }
