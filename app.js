@@ -597,13 +597,13 @@ function downloadImage(format) {
   img.src = url;
 }
 
-function updateSearch(query) {
+function updateSearch(query, isProgrammatic = false) {
   searchQuery = query;
-  if (DOM.searchInput && DOM.searchInput.value !== query) {
+  if ((isProgrammatic || document.activeElement !== DOM.searchInput) && DOM.searchInput && DOM.searchInput.value !== query) {
     DOM.searchInput.value = query;
   }
   if (DOM.clearSearchBtn) {
-    if (query) {
+    if (query && query.trim()) {
       DOM.clearSearchBtn.classList.remove('hidden');
     } else {
       DOM.clearSearchBtn.classList.add('hidden');
@@ -734,10 +734,10 @@ function setupEventListeners() {
   // Search input debounced
   DOM.searchInput?.addEventListener('input', (e) => {
     clearTimeout(_searchDebounceTimer);
-    _searchDebounceTimer = setTimeout(() => updateSearch(e.target.value.trim()), 120);
+    _searchDebounceTimer = setTimeout(() => updateSearch(e.target.value, false), 120);
   });
 
-  DOM.clearSearchBtn?.addEventListener('click', () => updateSearch(''));
+  DOM.clearSearchBtn?.addEventListener('click', () => updateSearch('', true));
 
   // Sort & Grid size settings persistence
   if (DOM.sortSelect) {
@@ -790,7 +790,7 @@ function setupEventListeners() {
     if (!tagBtn) return;
     const tag = tagBtn.dataset.tag;
     closeModals();
-    updateSearch(tag);
+    updateSearch(tag, true);
   });
 
   // Close modals handlers
