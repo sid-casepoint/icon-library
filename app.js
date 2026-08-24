@@ -828,17 +828,6 @@ function setupEventListeners() {
   // Site Logo Reset click handler
   DOM.siteLogo?.addEventListener('click', () => {
     updateSearch('', true);
-    
-    if (DOM.sortSelect) {
-      DOM.sortSelect.value = 'newest';
-      localStorage.setItem('sortPref', 'newest');
-    }
-    
-    if (DOM.gridSizeSelect) {
-      DOM.gridSizeSelect.value = '75';
-      localStorage.setItem('gridSizePref', '75');
-    }
-    
     selectedIcons.clear();
     updateMultiselectUI();
     closeModals();
