@@ -333,7 +333,7 @@ function getFilteredIcons() {
 }
 
 function renderIcons() {
-  const filtered = getFilteredIcons();
+  const filtered = [...getFilteredIcons()];
 
   if (DOM.iconCount) {
     DOM.iconCount.textContent = filtered.length;
@@ -347,8 +347,8 @@ function renderIcons() {
     if (sortMode === 'za') return nameB.localeCompare(nameA);
     const timeA = Number(a?.lastModified) || 0;
     const timeB = Number(b?.lastModified) || 0;
-    if (sortMode === 'newest') return timeB - timeA;
-    if (sortMode === 'oldest') return timeA - timeB;
+    if (sortMode === 'newest') return (timeB - timeA) || nameA.localeCompare(nameB);
+    if (sortMode === 'oldest') return (timeA - timeB) || nameA.localeCompare(nameB);
     return 0;
   });
 
